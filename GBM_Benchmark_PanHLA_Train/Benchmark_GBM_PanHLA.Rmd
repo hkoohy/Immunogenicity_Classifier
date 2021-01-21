@@ -1,0 +1,356 @@
+---
+title: "Benchmark_GBM_data using Pan HLA"
+author: "P Buckley"
+date: "03/06/2020"
+output: bookdown::html_document2
+---
+
+## Import packages
+
+```{r setup,message=FALSE}
+library(pROC)
+library(ggpubr)
+library(Biostrings)
+library(data.table)
+library(dplyr)
+library(PepTools)
+library(caret)
+library(purrr)
+library(PepTools)
+library(ggseqlogo)
+library(DiffLogo)
+library(tidyverse)
+library(yardstick)
+library(foreach)
+library(doParallel)
+library(stringdist)
+
+options(tibble.pillar.subtle=FALSE, tibble.pillar.sigfig=9, tibble.pillar.min_title_chars=10)
+select = dplyr::select
+```
+
+# Prepare the neoantigen test dataset
+
+```{r,message=FALSE,warning=FALSE}
+
+FullDataset = fread("GBM_Peptides.tsv")
+
+FullDataset=FullDataset %>% select(Norm_peptide,Mut_peptide,HLA_allele,Mismatches,tcell_response_updatedNov19) %>% dplyr::rename(
+  Peptide=Mut_peptide,HLA_Allele=HLA_allele,Immunogenicity=tcell_response_updatedNov19) %>% mutate(
+    Immunogenicity = ifelse(Immunogenicity=='positive','Positive','Negative'))
+
+# contradictory peptide is classed pve
+FullDataset[FullDataset$Peptide == 'SLHLDAWTI' & FullDataset$Immunogenicity == 'Negative',]$Immunogenicity = 'Positive'
+FullDataset=FullDataset %>% unique
+FullDataset=FullDataset %>% filter(width(Peptide)==9)
+
+FullDataset = FullDataset %>% select(!c(Mismatches))
+DT::datatable(FullDataset,caption = "GBM dataset. Peptide is the mutant peptide.")
+
+```
+
+## Functions
+
+```{r}
+calculate_f_beta = function(beta, precision, recall) {
+   return((beta^2 + 1)*(precision*recall / ((beta^2)*precision + recall)))
+}
+
+```
+
+# EDA
+- Showing the distribution of data after filtering. 
+```{r, fig.width=4,fig.height=5,dev='svg'}
+
+ FullDataset %>% select(Immunogenicity,HLA_Allele) %>% table %>% as.data.table %>% ggbarplot(x="Immunogenicity",y="N",fill="Immunogenicity",label=T,width=0.5) + ylab("Number of Peptides") + xlab("Immunogenicity Classification")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")  + font("legend.text",size=10) + labs(fill="Immunogenicity")
+
+```
+
+## Import the Pan HLA allele dataset 
+
+```{r}
+TrainingData = readRDS("../Analysis_Pan_HLA_Pathogenic/PanHLA_FullDataset.rds")
+TrainingData=TrainingData %>% as.data.table
+
+```
+
+
+# Analysis
+
+```{r}
+combinedData=readRDS(file="GBM_PAN_HLA_combinedData.rds")%>% as.data.table
+combinedData %>% DT::datatable()
+
+ # write.table(combinedData,"GBM_PanHLA_combinedData.txt",sep="\t",row.names = F,quote=F)
+
+```
+
+## Accuracy
+```{r,fig.width=8,fig.height=6,message=FALSE,warning=FALSE,fig.cap="Barplot illustrating the accuracy of each model after training models as they come out the box."}
+
+accuracyDF=combinedData %>% group_by(Dataset) %>% summarise(Accuracy=sum(ImmunogenicityPrediction==Immunogenicity)/n())
+
+```
+
+## AUC 
+- Compute ROC-AUC and plot the curves. This is not a great metric for imbalanced data but it provides a little context for model comparison.
+```{r,fig.width=8,fig.height=6,message=FALSE,warning=FALSE,dev='svg',fig.cap="Area Under the Curve of each model after OTB assessment against neoantigens."}
+
+NETTEPIAUC=roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'NETTEPI'))
+IPREDAUC=roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'IPRED'))
+IEDBMODELAUC=roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'IEDB'))
+REPITOPE_AUC_CV=roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'REPITOPE'))
+NetTepi_NETMHC.AUC.CV = roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'NETTEPI_netMHCpan4'))
+
+roc.AUC=ggroc(list(IEDB_Model=IEDBMODELAUC,iPred=IPREDAUC,NetTepi=NETTEPIAUC,NetTepi_NetMHCpan4=NetTepi_NETMHC.AUC.CV,REpitope=REPITOPE_AUC_CV),legacy.axes = TRUE,size=1.25) + theme_bw() +
+  annotate("text",x=.55,y=.185,label=paste0("IEDB:     ",round(auc(IEDBMODELAUC),digits=2),"\n","iPred:     ",round(auc(IPREDAUC),digits=2),"\n","NetTepi: ",round(auc(NETTEPIAUC),digits=2),"\n","NetTepi_NetMHCpan4: ",round(auc(NetTepi_NETMHC.AUC.CV),digits=2),"\n","Repitope: ",round(auc(REPITOPE_AUC_CV),digits=2))) + font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.title",color="white") + font("legend.text",size=10) + geom_abline(size=1,intercept = 0, slope = 1,color = "darkgrey", linetype = "dashed")
+
+```
+
+
+## PR-AUC
+
+```{r,dev='svg'}
+combinedData$Immunogenicity = factor(combinedData$Immunogenicity,levels = c("Positive","Negative"))
+PR_AUC_COMBINED=combinedData %>% group_by(Dataset) %>% pr_auc(Immunogenicity,ImmunogenicityScore)
+PR_AUC_COMBINED$.estimate=round(PR_AUC_COMBINED$.estimate,digits=2)
+pr.AUC=combinedData %>% group_by(Dataset) %>% pr_curve(Immunogenicity,ImmunogenicityScore) %>% autoplot() + aes(size = Dataset)+scale_size_manual(values=c(1.25,1.25,1.25,1.25,1.25))+ ggtitle("Precision-Recall Curves") +annotate("text",x=.65,y=.80,label=paste0("IEDB: ",PR_AUC_COMBINED$.estimate[1],"\n","iPred: ",PR_AUC_COMBINED$.estimate[2],"\n","NetTepi: ",PR_AUC_COMBINED$.estimate[3],"\n","NetTepi_NetMHCpan4: ",PR_AUC_COMBINED$.estimate[4],"\n","Repitope: ",PR_AUC_COMBINED$.estimate[5])) + geom_hline(size=1,color="darkgrey",yintercept = nrow(FullDataset[FullDataset$Immunogenicity=='Positive',]) / nrow(FullDataset),linetype="dashed")+ font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.title",color="white") + font("legend.text",size=10)
+```
+
+## Plot ROC-AUC 
+
+```{r,dev='svg'}
+gl <- lapply(list(roc.AUC,pr.AUC), ggplotGrob)
+library(grid)
+widths <- do.call(unit.pmax, lapply(gl, "[[", "widths"))
+heights <- do.call(unit.pmax, lapply(gl, "[[", "heights"))
+lg <- lapply(gl, function(g) {g$widths <- widths; g$heights <- heights; g})
+grid.newpage()
+grid.draw(lg[[1]])
+```
+
+## Plot PR-AUC
+- Main text Fig 2C
+
+```{r,dev='svg'}
+grid.newpage()
+grid.draw(lg[[2]])
+
+```
+
+## F1 Score 
+
+```{r,fig.width=8,fig.height=6,message=FALSE,warning=FALSE,fig.cap="Barplot illustrating the F1 Score of each model ."}
+
+combinedData$Immunogenicity = factor(combinedData$Immunogenicity,levels=c("Positive","Negative"))
+combinedData$ImmunogenicityPrediction = factor(combinedData$ImmunogenicityPrediction,levels=c("Positive","Negative"))
+
+F1SCORE=combinedData %>% group_by(Dataset) %>% dplyr::summarise(F1_SCORE= confusionMatrix(positive = "Positive",mode = "prec_recall",
+                                                                           reference=Immunogenicity,ImmunogenicityPrediction)$byClass["F1"])              
+```
+
+## Precision 
+
+```{R ,fig.width=8,fig.height=6,message=FALSE,warning=FALSE,fig.cap="Barplot illustrating the Precision of each model after performing 10-fold cross validation against the IEDB Gold Standard test dataset."}
+
+
+PRECISIONCV=combinedData %>% group_by(Dataset) %>% dplyr::summarise(Precision= confusionMatrix(positive = "Positive",mode = "prec_recall",
+                                                                           reference=Immunogenicity,ImmunogenicityPrediction)$byClass["Precision"])                                                                           
+
+```
+
+
+## Recall 
+
+```{r CVRecallScore,fig.width=8,fig.height=6,message=FALSE,warning=FALSE,fig.cap="Barplot illustrating the Recall of each model after performing 10-fold cross validation against the IEDB Gold Standard test dataset."}
+
+
+RECALLCV=combinedData %>% group_by(Dataset) %>% dplyr::summarise(Recall= confusionMatrix(positive = "Positive",mode = "prec_recall",
+                                                                           reference=Immunogenicity,ImmunogenicityPrediction)$byClass["Recall"]) %>% as.data.table                         
+
+```
+
+## Balanced Accuracy 
+
+```{r baancedacc,fig.width=8,fig.height=6,message=FALSE,warning=FALSE,fig.cap="Barplot illustrating the Balanced Accuracy of each model after performing 10-fold cross validation against the IEDB Gold Standard test dataset."}
+
+BALACCURACYCV=combinedData %>% group_by(Dataset) %>% dplyr::summarise(BalancedAccuracy= confusionMatrix(positive = "Positive",mode = "prec_recall",
+                                                                           reference=Immunogenicity,ImmunogenicityPrediction)$byClass["Balanced Accuracy"])                                                                           
+
+
+```
+
+## Visualise all metrics
+
+```{r}
+F0.5SCORE=inner_join(RECALLCV,PRECISIONCV) %>% group_by(Dataset) %>% dplyr::summarise(F_0.5 = calculate_f_beta(0.5,Precision,Recall))
+```
+
+```{r UNBALSFACETWRAPCVDATA,fig.height=8,fig.width=9}
+
+accuracyDF %>% inner_join(F1SCORE) %>% inner_join(PRECISIONCV) %>% inner_join(RECALLCV) %>% inner_join(F0.5SCORE) %>% inner_join(BALACCURACYCV) %>% melt(variable.name="Metric") %>% ggbarplot(
+  x="Dataset",y="value",fill="Metric",label = T,lab.nb.digits = 2
+) + facet_wrap(~Metric) + rotate_x_text(angle=90) + ylim(0,1)
+```
+
+# Shuffle the data to create distribution of randomised metric scores
+## PR-AUC
+
+```{r,cache=TRUE,fig.cap="Area under the precision-recall curve for a distribution of PR-AUC values after randomising the true classification. Dashed line shows PR-AUC of the predictions made during the benchmarking experiment.",fig.width=6,fig.height=6,dev='svg'}
+
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+ PR_AUC_RAND.DIST=foreach(i = 1:1000, .combine = rbind,.packages = c("dplyr","magrittr","yardstick","data.table")) %dopar% {
+combinedData %>%  group_by(Dataset) %>% mutate(Shuffled_Immunogenicity=sample(size=n(),Immunogenicity))  %>% pr_auc(Shuffled_Immunogenicity,ImmunogenicityScore) %>% mutate(sampleNum=i)
+   }
+
+stopCluster(cl)
+
+
+PR_AUC_COMBINED=combinedData %>% group_by(Dataset) %>% pr_auc(Immunogenicity,ImmunogenicityScore)
+
+
+PR_AUC_RAND.DIST %>% ggdensity(x=".estimate",y="..density..",fill="Dataset",add="mean",color = "Dataset",alpha=0.3)  + facet_wrap(~Dataset) + geom_vline(data=PR_AUC_COMBINED,aes(xintercept=.estimate),color="black",linetype="dashed") + xlab("Area under the precision-recall curve") + font("xy.text",size=12,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.title",color="white") + font("legend.text",size=10)+ theme(legend.position = "none")+rotate_x_text(angle=90)
+
+PR_AUC_RAND.DIST %>% group_by(Dataset) %>% dplyr::summarise(Random_mean=mean(.estimate),sd=sd(.estimate)) %>% inner_join(PR_AUC_COMBINED %>% select(!c(.metric,.estimator))) %>% dplyr::rename(Predicted=.estimate) %>% mutate(zscore = round(((Predicted-Random_mean)/sd),2) ) %>% DT::datatable(caption="Mean, sd and zscore to show distance from mean of random distribution")
+
+
+```
+
+## IEDB Model Confusion Matrix
+
+```{r iedbcmatrix, message=FALSE,warning=FALSE,fig.width=6,fig.height=6,fig.cap="IEDB Confusion Matrix. Color is relative to sensitivity/specificity by proportional outcomes within reference groups",dev='svg'}
+
+CM=confusionMatrix(positive = "Positive",mode = "prec_recall",reference=factor(combinedData %>% filter(Dataset %in% 'IEDB')  %>% select(Immunogenicity) %>% pull(),
+                       levels = c("Negative","Positive")),
+                       factor(combinedData %>% filter(Dataset %in% 'IEDB') %>% select(ImmunogenicityPrediction) %>% pull(),
+                       levels=c("Negative","Positive")))
+CM
+table=data.frame(CM$table)
+
+plotTable <- table %>%
+  mutate(Performance = ifelse(table$Prediction == table$Reference, "Good", "Bad")) %>%
+  group_by(Reference) %>%
+  mutate(prop = Freq/sum(Freq))
+
+
+ggplot(data = plotTable, mapping = aes(x = Reference, y = Prediction, fill = Performance, alpha = prop)) +
+  geom_tile() +
+  geom_text(aes(label = Freq), vjust = .5, fontface  = "bold", alpha = 1,size=8) +
+  scale_fill_manual(values = c(Good = "green", Bad = "red")) +
+  theme_bw() +
+  xlim(rev(levels(table$Reference))) + font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.text",size=10)+ ggtitle("IEDB Immunogenicity Model")
+
+
+```
+
+
+## NetTepi Confusion Matrix
+
+```{r netTepimatrix, message=FALSE,warning=FALSE,fig.width=6,fig.height=6,fig.cap="NetTepi Confusion Matrix. Color is relative to sensitivity/specificity by proportional outcomes within reference groups",dev='svg'}
+
+CM=confusionMatrix(positive = "Positive",mode = "prec_recall",reference=factor(combinedData %>% filter(Dataset == 'NETTEPI')  %>% select(Immunogenicity) %>% pull(),
+                       levels = c("Negative","Positive")),
+                       factor(combinedData %>% filter(Dataset == 'NETTEPI') %>% select(ImmunogenicityPrediction) %>% pull(),
+                       levels=c("Negative","Positive")))
+CM
+table=data.frame(CM$table)
+
+plotTable <- table %>%
+  mutate(Performance = ifelse(table$Prediction == table$Reference, "Good", "Bad")) %>%
+  group_by(Reference) %>%
+  mutate(prop = Freq/sum(Freq))
+
+
+ggplot(data = plotTable, mapping = aes(x = Reference, y = Prediction, fill = Performance, alpha = prop)) +
+  geom_tile() +
+  geom_text(aes(label = Freq), vjust = .5, fontface  = "bold", alpha = 1,size=8) +
+  scale_fill_manual(values = c(Good = "green", Bad = "red")) +
+  theme_bw() +
+  xlim(rev(levels(table$Reference))) + font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.text",size=10)+ ggtitle("NetTepi")
+
+
+```
+
+## NetTepi w NetMHCpan 4 confusion matrix
+
+```{r ,dev='svg', message=FALSE,warning=FALSE,fig.width=6,fig.height=6,fig.cap="NetTepi Confusion Matrix. Color is relative to sensitivity/specificity by proportional outcomes within reference groups"}
+
+CM=confusionMatrix(positive = "Positive",mode = "prec_recall",reference=factor(combinedData %>% filter(Dataset == 'NETTEPI_netMHCpan4')  %>% select(Immunogenicity) %>% pull(),
+                       levels = c("Negative","Positive")),
+                       factor(combinedData %>% filter(Dataset == 'NETTEPI_netMHCpan4') %>% select(ImmunogenicityPrediction) %>% pull(),
+                       levels=c("Negative","Positive")))
+CM
+table=data.frame(CM$table)
+
+plotTable <- table %>%
+  mutate(Performance = ifelse(table$Prediction == table$Reference, "Accurate", "Inaccurate")) %>%
+  group_by(Reference) %>%
+  mutate(prop = Freq/sum(Freq))
+
+
+ggplot(data = plotTable, mapping = aes(x = Reference, y = Prediction, fill = Performance, alpha = prop)) +
+  geom_tile() +
+  geom_text(aes(label = Freq), vjust = .5, fontface  = "bold", alpha = 1,size=8) +
+  scale_fill_manual(values = c(Accurate = "green", Inaccurate = "red")) +
+  theme_bw() +
+  xlim(rev(levels(table$Reference)))+ font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.text",size=10)+ font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.text",size=10) + ggtitle("NETTEPI_netMHCpan4")
+
+
+```
+
+## iPred Confusion Matrix
+
+```{r iPredmatrix, message=FALSE,warning=FALSE,fig.width=6,fig.height=6,fig.cap="iPred Confusion Matrix. Color is relative to sensitivity/specificity by proportional outcomes within reference groups",dev='svg'}
+
+CM=confusionMatrix(positive = "Positive",mode = "prec_recall",reference=factor(combinedData %>% filter(Dataset %in% 'IPRED')  %>% select(Immunogenicity) %>% pull(),
+                       levels = c("Negative","Positive")),
+                       factor(combinedData %>% filter(Dataset %in% 'IPRED') %>% select(ImmunogenicityPrediction) %>% pull(),
+                       levels=c("Negative","Positive")))
+CM
+table=data.frame(CM$table)
+
+plotTable <- table %>%
+  mutate(Performance = ifelse(table$Prediction == table$Reference, "Good", "Bad")) %>%
+  group_by(Reference) %>%
+  mutate(prop = Freq/sum(Freq))
+
+
+ggplot(data = plotTable, mapping = aes(x = Reference, y = Prediction, fill = Performance, alpha = prop)) +
+  geom_tile() +
+  geom_text(aes(label = Freq), vjust = .5, fontface  = "bold", alpha = 1,size=8) +
+  scale_fill_manual(values = c(Good = "green", Bad = "red")) +
+  theme_bw() +
+  xlim(rev(levels(table$Reference)))+ font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.text",size=10) + ggtitle("iPred")
+
+
+```
+
+## REPITOPE Confusion Matrix
+
+```{r REPITOPEmatrix, message=FALSE,warning=FALSE,fig.width=6,fig.height=6,fig.cap="REpitope Confusion Matrix. Color is relative to sensitivity/specificity by proportional outcomes within reference groups",dev='svg'}
+
+CM=confusionMatrix(positive = "Positive",mode = "prec_recall",reference=factor(combinedData %>% filter(Dataset %in% 'REPITOPE')  %>% select(Immunogenicity) %>% pull(),
+                       levels = c("Negative","Positive")),
+                       factor(combinedData %>% filter(Dataset %in% 'REPITOPE') %>% select(ImmunogenicityPrediction) %>% pull(),
+                       levels=c("Negative","Positive")))
+CM
+table=data.frame(CM$table)
+
+plotTable <- table %>%
+  mutate(Performance = ifelse(table$Prediction == table$Reference, "Good", "Bad")) %>%
+  group_by(Reference) %>%
+  mutate(prop = Freq/sum(Freq))
+
+
+ggplot(data = plotTable, mapping = aes(x = Reference, y = Prediction, fill = Performance, alpha = prop)) +
+  geom_tile() +
+  geom_text(aes(label = Freq), vjust = .5, fontface  = "bold", alpha = 1,size=8) +
+  scale_fill_manual(values = c(Good = "green", Bad = "red")) +
+  theme_bw() +
+  xlim(rev(levels(table$Reference)))+ font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.text",size=10) + ggtitle("REpitope")
+
+```

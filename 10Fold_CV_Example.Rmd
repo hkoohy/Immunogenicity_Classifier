@@ -1,0 +1,379 @@
+---
+title: "10Fold_CV_Example"
+author: "PBUCKLEY"
+date: "21/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(pROC)
+library(ggpubr)
+library(Biostrings)
+library(data.table)
+library(dplyr)
+library(PepTools)
+library(caret)
+library(purrr)
+library(readxl)
+library(PepTools)
+library(ggseqlogo)
+library(DiffLogo)
+library(tidyverse)
+library(yardstick)
+library(doParallel)
+library(foreach)
+library(stringdist)
+
+```
+
+```{r}
+# Function to provide a closest match. Used to match HLA Alleles across mixed output styles.
+ClosestMatch2 = function(string, stringVector){
+  
+  stringVector[amatch(string, stringVector, maxDist=Inf)]
+  
+}
+```
+
+
+# 10 Fold CV Example
+- The below will illustrate how each model was trained and employed for 10-fold cross-validation based benchmarking.
+- The models will only run once installed locally, and after some modification to allow a change in training data (please see Methods and Table 1).
+
+# Read in Pan HLA dataset and folds
+```{r}
+FullDataset = readRDS("Analysis_HLA_specific_Pathogenic/A201_standardData_forAnalysis_BALANCED.rds")
+FullDataset = FullDataset %>% as.data.table
+# write.table(FullDataset,file="Analysis_HLA_specific_Pathogenic/A201_standardData_forAnalysis_BALANCED.txt",quote=F,row.names = F,sep="\t")
+folds=readRDS(file = "Analysis_HLA_specific_Pathogenic/A201_standardData_Folds_BALANCED.rds")
+
+```
+
+# IEDB Model
+## Train and Test
+- For each fold generated above, the data is subset into training and test
+- Then Positive and Negative peptides are seperated and the frequency of each AA is calculated for positive and negative data
+- These are compiled into 'EnrichmentData' data table [distributions can be visualised if necessary]
+- This is then summarised and converted into ln enrichment scores
+- Enrichment scores per amino acid are compiled into a python dictionary format, whch is output.
+- This dictionary is then read into the IEDB model, and the model python code is executed on our test data, using the training data calculations 
+
+```{r,message=FALSE,warning=FALSE}
+select=dplyr::select
+
+  for(i in 1:length(folds)) {
+# TRAIN THE MODEL
+  #Subset data into training/test based on the folds above. 
+trainingData_fold = FullDataset[-folds[[i]]]
+testData_fold = FullDataset[folds[[i]]]
+
+  # Calculate amino acid frequencies for positive data training
+PositiveSeqsIEDB=trainingData_fold %>% filter(Immunogenicity %in% 'Positive') %>% select(Peptide) %>% pull() 
+NumberAAsInPosSeq=PositiveSeqsIEDB %>% paste(collapse = "") %>% strsplit(split="") %>% unlist()%>%`[`(!. %in% c("", " ", ".", ",","X")) %>% table %>% sum()
+PositiveSeq.AA.Freq.IEDB=PositiveSeqsIEDB %>% paste(collapse = "") %>% strsplit(split="") %>% unlist() %>%`[`(!. %in% c("", " ", ".", ",","X")) %>%  table / NumberAAsInPosSeq
+
+  # calculate AA freqs for negative data training
+NegativeSeqsIEDB=trainingData_fold %>% filter(Immunogenicity %in% 'Negative') %>% select(Peptide) %>% pull()
+NumberAAsInNegSeq=NegativeSeqsIEDB %>% paste(collapse = "") %>% strsplit(split="") %>% unlist() %>%`[`(!. %in% c("", " ", ".", ",","X")) %>% table %>% sum()
+NegativeSeq.AA.Freq.IEDB=NegativeSeqsIEDB %>% paste(collapse = "") %>% strsplit(split="") %>% unlist() %>%`[`(!. %in% c("", " ", ".", ",","X")) %>% table / NumberAAsInNegSeq
+
+  # Compile frequencies into a data table
+EnrichmentData=data.table("Positive"=PositiveSeq.AA.Freq.IEDB,"Negative"=NegativeSeq.AA.Freq.IEDB) %>% select(!Negative..) %>% dplyr::rename(
+  AminoAcid = Positive..,Negative=Negative.N,Positive=Positive.N) 
+  # Perform natural log calculations on the percentages to produce the log enrichment scores. 
+EnrichmentData=EnrichmentData %>% mutate(Positive_Percent=Positive*100,Negative_Percent=Negative*100) %>% group_by(
+  AminoAcid) %>% dplyr::summarise(Nat_Log_Enrichment = log(Positive_Percent / Negative_Percent))
+
+  # Write out to python dictionary format
+EnrichmentData$AminoAcid= paste("\"",EnrichmentData$AminoAcid,"\"",sep="")
+dictionarySentence = paste(EnrichmentData$AminoAcid,EnrichmentData$Nat_Log_Enrichment,sep=":",collapse = ",")
+write.table(paste0("{",dictionarySentence,"}"),row.names = FALSE,quote=FALSE,file="../../IEDB_Immunogenicity_Model_Calis/immunogenicity_model/dictionary.txt",col.names = FALSE)
+
+# RUN THE MODEL AGAINST OUR TEST DATA
+TEST_DATA_LOCATION="Analysis_HLA_specific_Pathogenic/IEDB/"
+for(allele_i in 1:length(unique(testData_fold$HLA_Allele))){ # Split data by HLA Allele
+  HLA_ALLELE_FOR_TESTING = gsub(x=unique(testData_fold$HLA_Allele)[allele_i],pattern=":",replacement = "")
+    
+  # Export test data and run.
+  testdata=paste0(TEST_DATA_LOCATION,"Allele_",HLA_ALLELE_FOR_TESTING,"_","Fold_",i,"_test_data.txt")
+write.table(testData_fold %>% filter(HLA_Allele %in% unique(testData_fold$HLA_Allele)[allele_i]) %>% select(Peptide) %>% pull,file=testdata,sep="\n",col.names = F,row.names = F,quote=F)
+  # Run NetTepi 
+RESULTS_OUTPUT = paste0(TEST_DATA_LOCATION,"Allele_",HLA_ALLELE_FOR_TESTING,"_","Fold_",i,"_Results.txt")
+system(paste0("python ../../IEDB_Immunogenicity_Model_Calis/immunogenicity_model/PB_TRAIN_predict_immunogenicity.py ",testdata, 
+              " --allele=",HLA_ALLELE_FOR_TESTING," > ",RESULTS_OUTPUT))
+  }
+}
+
+
+```
+
+## Read in and process results
+
+```{r,message=FALSE,warning=FALSE}
+
+# Read in all results files
+files <- dir(TEST_DATA_LOCATION, pattern = "*_Results") 
+
+data3 <- data_frame(file = files) %>%
+  mutate(file_contents = map(file,      
+           ~ fread(file.path(TEST_DATA_LOCATION, .))) 
+  )
+IEDB_RESULTS <- unnest(data3)
+# Files are output from IEDB per allele and saved with the allele in the file name. Allele is not output in the data, so the below extracts alllele information into a column
+IEDB_RESULTS=IEDB_RESULTS %>% mutate(Fold= parse_number(str_extract(IEDB_RESULTS$file,"Fold_[:digit:]*")))
+IEDB_RESULTS$file=gsub(x=IEDB_RESULTS$file,pattern="_Fold_[0-9]*_Results.txt",replacement="")
+IEDB_RESULTS=IEDB_RESULTS %>% mutate(HLA_Allele = gsub(x=IEDB_RESULTS$file,pattern="Allele_",replacement = ""))
+# The below finds the closest match with the allele format saved by IEDB and that in the original dataset.
+IEDB_RESULTS$HLA_Allele = ClosestMatch2(IEDB_RESULTS$HLA_Allele,unique(FullDataset$HLA_Allele))
+# Munge the data and join it with the original full dataset
+IEDB_RESULTS=IEDB_RESULTS %>% dplyr::rename(Peptide=peptide, ImmunogenicityScore=score) %>% select(!file)
+IEDB_RESULTS=IEDB_RESULTS %>% inner_join(FullDataset,by=c("Peptide","HLA_Allele")) %>% select(!length) %>% mutate(Dataset = "IEDB")
+
+# Compute an optimal threshold
+roc1=roc(Immunogenicity ~ ImmunogenicityScore,data = IEDB_RESULTS)
+threshold=coords(roc=roc1, x="best", input="threshold", best.method="youden", transpose=F)$threshold
+
+# Create a binary prediction based on the thresholding
+IEDB_RESULTS=IEDB_RESULTS %>% mutate(ImmunogenicityPrediction = ifelse(ImmunogenicityScore>=threshold,"Positive","Negative"))
+
+```
+
+# NetTepi Model 
+
+## Train and run 10 fold cv for NetTepi
+
+```{r ,message=FALSE,warning=FALSE}
+trainingData_fold = NULL
+testData_fold=NULL
+# cant parallelise this. Writes a file which nettepi needs live.
+for(i in 1:length(folds)) {
+
+# TRAIN THE MODEL
+    #Subset data into training/test based on the folds above. 
+trainingData_fold = FullDataset[-folds[[i]]]
+testData_fold = FullDataset[folds[[i]]]
+
+# Calculate amino acid frequencies for positive data training
+PositiveSeqsIEDB=trainingData_fold %>% filter(Immunogenicity %in% 'Positive') %>% select(Peptide) %>% pull() 
+NumberAAsInPosSeq=PositiveSeqsIEDB %>% paste(collapse = "") %>% strsplit(split="") %>% unlist()%>%`[`(!. %in% c("", " ", ".", ",","X")) %>% table %>% sum()
+PositiveSeq.AA.Freq.IEDB=PositiveSeqsIEDB %>% paste(collapse = "") %>% strsplit(split="") %>% unlist() %>%`[`(!. %in% c("", " ", ".", ",","X")) %>%  table / NumberAAsInPosSeq
+
+# calculate AA freqs for negative data training
+NegativeSeqsIEDB=trainingData_fold %>% filter(Immunogenicity %in% 'Negative') %>% select(Peptide) %>% pull()
+NumberAAsInNegSeq=NegativeSeqsIEDB %>% paste(collapse = "") %>% strsplit(split="") %>% unlist() %>%`[`(!. %in% c("", " ", ".", ",","X")) %>% table %>% sum()
+NegativeSeq.AA.Freq.IEDB=NegativeSeqsIEDB %>% paste(collapse = "") %>% strsplit(split="") %>% unlist() %>%`[`(!. %in% c("", " ", ".", ",","X")) %>% table / NumberAAsInNegSeq
+
+  # Compile frequencies into a data table
+EnrichmentData=data.table("Positive"=PositiveSeq.AA.Freq.IEDB,"Negative"=NegativeSeq.AA.Freq.IEDB) %>% select(!Negative..) %>% dplyr::rename(
+  AminoAcid = Positive..,Negative=Negative.N,Positive=Positive.N) 
+  # Perform natural log calculations on the percentages to produce the log enrichment scores. 
+EnrichmentData=EnrichmentData %>% mutate(Positive_Percent=Positive*100,Negative_Percent=Negative*100) %>% group_by(
+  AminoAcid) %>% dplyr::summarise(Nat_Log_Enrichment = log(Positive_Percent / Negative_Percent))
+
+# write out training information to format (.mod) for net tepi
+colnames(EnrichmentData) = c(paste0("#","AA"), "log enrichment score")
+data.table("#Pos"=c(seq_len(9)),"Importance"=c(NA,NA,0.1,0.31,0.30,0.29,0.26,0.18,NA))
+write.table(EnrichmentData,file="/Applications/netTepi-1.0/tcell_propensity/pb_iedb.mod",row.names = F,quote=F,sep="\t")
+write.table("\n",file="/Applications/netTepi-1.0/tcell_propensity/pb_iedb.mod",row.names = F,quote=F,col.names = F,append = TRUE)
+write.table(data.table("#Pos"=c(seq_len(9)),"Importance"=c(NA,NA,0.1,0.31,0.30,0.29,0.26,0.18,NA))
+,file="/Applications/netTepi-1.0/tcell_propensity/pb_iedb.mod",row.names = F,quote=F,sep="\t",append = TRUE)
+
+# TEST THE MODEL
+TEST_DATA_LOCATION="Analysis_HLA_specific_Pathogenic/NETTEPI/"
+for(allele_i in 1:length(unique(testData_fold$HLA_Allele))){  # Split data by HLA Allele
+  HLA_ALLELE_FOR_TESTING = gsub(x=unique(testData_fold$HLA_Allele)[allele_i],pattern=":",replacement = "")
+  
+  # Export test data and run.
+  testdata=paste0(TEST_DATA_LOCATION,"Allele_",HLA_ALLELE_FOR_TESTING,"_","Fold_",i,"_test_data.txt")
+write.table(testData_fold %>% filter(HLA_Allele %in% unique(testData_fold$HLA_Allele)[allele_i]) %>% select(Peptide) %>% pull,file=testdata,sep="\n",col.names = F,row.names = F,quote=F)
+  # Run model
+RESULTS_OUTPUT = paste0(TEST_DATA_LOCATION,"Allele_",HLA_ALLELE_FOR_TESTING,"_","Fold_",i,"_Results.xls")
+system(paste0("/Applications/netTepi-1.0/netTepi -p ",testdata," -a ",unique(testData_fold$HLA_Allele)[allele_i]," -xlsfile ", RESULTS_OUTPUT))
+system(paste0("mv ",RESULTS_OUTPUT," " ,gsub(x=RESULTS_OUTPUT,pattern=".xls",replacement=""),".csv"))
+  }
+}
+```
+
+
+### Read in the results data
+
+```{r warning=FALSE, r,message=FALSE}
+TEST_DATA_LOCATION="Analysis_HLA_specific_Pathogenic/NETTEPI/"
+
+# Read in all results files
+files <- dir(TEST_DATA_LOCATION, pattern = "_Results.csv") 
+
+data3 <- data_frame(Fold = files) %>%
+  mutate(file_contents = map(Fold,      
+           ~ fread(file.path(TEST_DATA_LOCATION, .))) 
+  )
+# Munge the data, deselecting columns and changing column names.
+NetTepi_CV_FULL_RESULTS <- unnest(data3) %>% as.data.table  %>% dplyr::select(!c(Pos,Identity,Aff,Stab,Tcell,`%Rank`))
+
+NetTepi_CV_FULL_RESULTS=NetTepi_CV_FULL_RESULTS %>% dplyr::rename(ImmunogenicityScore=Comb,HLA_Allele=Allele) 
+
+# Extract the fold information from the file name
+NetTepi_CV_FULL_RESULTS$Fold= parse_number(str_extract(NetTepi_CV_FULL_RESULTS$Fold,"Fold_[:digit:]*"))
+# Inner join with the full dataset.
+NetTepi_CV_FULL_RESULTS=NetTepi_CV_FULL_RESULTS %>% inner_join(FullDataset,by=c("Peptide","HLA_Allele"))
+# Compute an optimal threshold
+roc1=roc(Immunogenicity ~ ImmunogenicityScore,data = NetTepi_CV_FULL_RESULTS)
+threshold=coords(roc=roc1, x="best", input="threshold", best.method="youden", transpose=F)$threshold
+# Create a binary prediction based on the thresholding
+NetTepi_CV_FULL_RESULTS=NetTepi_CV_FULL_RESULTS %>% mutate(ImmunogenicityPrediction = ifelse(ImmunogenicityScore>=threshold,"Positive","Negative")) %>% mutate(Dataset="NETTEPI")
+
+```
+
+# Train iPred
+## iPred Model : Train and run 10 fold cv for iPred
+- Use the same data and same folds to train and test iPred using 10 fold cv.
+
+```{r, iPredTraining,fig.width=8,fig.height=6,message=FALSE,warning=FALSE,fig.cap="Density or PCA plots of each fold for iPred.",fig.show='hide'}
+
+trainingData_fold = NULL
+testData_fold=NULL
+
+for(i in 1:length(folds)) {
+
+# TRAIN AND TEST THE MODEL
+trainingData_fold = FullDataset[-folds[[i]]]
+testData_fold = FullDataset[folds[[i]]]
+# Munge and write out the training data so it can be read into the script that trains iPred
+write.table(trainingData_fold %>% dplyr::select(Peptide,HLA_Allele,Immunogenicity) %>% dplyr::rename(antigen.epitope = Peptide, hla=HLA_Allele,immunogenicity=Immunogenicity),
+            file="Analysis_HLA_specific_Pathogenic/classifier/GS_iPred_train.txt",quote=F,row.names = F,sep="\t")
+# Train iPred
+source("Analysis_HLA_specific_Pathogenic/running_cv_set_up_ipred_final.R",chdir = TRUE)
+# Use the newly sourced 'predict_imm' function, which calls the model trained above, to make predictions for the test dataset for current fold.
+test_ipred_results=predict_imm(testData_fold$Peptide) %>% dplyr::rename(Peptide=antigen.epitope,ImmunogenicityScore=imm.prob)
+testData_fold=testData_fold %>% inner_join(test_ipred_results)
+
+
+write.csv(testData_fold,file=paste0("Analysis_HLA_specific_Pathogenic/IPRED/iPred_test_results_fold_",i,".txt"),quote=F,row.names=F)
+
+}
+
+
+```
+
+## iPred Model : read in the results data
+
+```{r ,message=FALSE,warning=FALSE}
+
+data_path <- "Analysis_HLA_specific_Pathogenic//IPRED/"   
+files <- dir(data_path, pattern = "*_results_fold*") 
+
+data3 <- data_frame(Fold = files) %>%
+  mutate(file_contents = map(Fold,      
+           ~ fread(file.path(data_path, .))) 
+  )
+
+IPRED_CV_FULL_RESULTS <- unnest(data3)
+
+IPRED_CV_FULL_RESULTS$Fold=gsub(x=IPRED_CV_FULL_RESULTS$Fold,pattern="[^[:digit:]]",replacement="")
+
+IPRED_CV_FULL_RESULTS=IPRED_CV_FULL_RESULTS %>% mutate(Dataset="IPRED")
+
+# Compute threshold
+roc1=roc(Immunogenicity ~ ImmunogenicityScore,data = IPRED_CV_FULL_RESULTS)
+threshold=coords(roc=roc1, x="best", input="threshold", best.method="youden", transpose=F)$threshold
+# Classify based on threshold.
+IPRED_CV_FULL_RESULTS=IPRED_CV_FULL_RESULTS %>% mutate(ImmunogenicityPrediction= ifelse(
+  ImmunogenicityScore >= threshold,"Positive","Negative"))
+```
+
+## REpitope: Compile 10 fold cv results
+- Repitope takes far too long to run 'live', so the results are imported. An example script to produce 10fold cv for Repitope is provided.
+```{r, message=FALSE,warning=FALSE}
+# Read in the results from Repitope folder.
+data_path <- "Analysis_HLA_specific_Pathogenic/REpitope/"
+ files <- dir(data_path, pattern = "FOLD_CV_PREDICTIONS_*")
+data3 <- data_frame(Fold = files) %>%
+  mutate(file_contents = map(Fold,
+           ~ fread(file.path(data_path, .)))
+  )
+REPITOPE.RESULTS <- unnest(data3)
+# Join with the original Full dataset
+REPITOPE.RESULTS=FullDataset %>% inner_join(REPITOPE.RESULTS)
+# compute a threshold from the ROC-AUC curves
+roc1=roc(Immunogenicity ~ ImmunogenicityScore,data = REPITOPE.RESULTS)
+threshold=coords(roc=roc1, x="best", input="threshold", best.method="youden", transpose=F)$threshold
+# Use the threshold to classify predictions
+REPITOPE.RESULTS=REPITOPE.RESULTS  %>% mutate(ImmunogenicityPrediction = ifelse(ImmunogenicityScore>=threshold,"Positive","Negative")) %>% mutate(Dataset="REPITOPE")
+# Further final munging
+REPITOPE.RESULTS=REPITOPE.RESULTS %>% select(!ImmunogenicityScore.cv)
+REPITOPE.RESULTS$Fold=extract_numeric(REPITOPE.RESULTS$Fold)
+```
+
+## NetTepi_NetMHCpan Model
+- Exploration of weight and NetMHCpan prediction inplace of Stab/Aff
+- 10-fold cv is run to generate the T cell propensity score and the netmhcpan predictions for each dataset.
+- A weight on T cell propensity score 't' is explored to maximise AUC.
+- Script to run this analysis is in 'Balanced_CreateData_NetTepi_NetMHCpan4_Balanced_stdData_A201.R'
+
+```{r NetTepi_weights_results,message=FALSE,warning=FALSE}
+source("Analysis_HLA_specific_Pathogenic/Balanced_CreateData_NetTepi_NetMHCpan4_Balanced_stdData_A201.R",chdir = TRUE)
+# Read in the analysis of the weights, to choose the weight which maximises roc-auc
+NetTepi_MHCpan.weights=fread("Analysis_HLA_specific_Pathogenic/NetTepi_netMHCpan4_Balanced_stdData_Analysis_A201/NetTepi_netMHCResults_FULL_T_EXPLORATION_WEIGHTS.csv")
+# Read in all the results, based on 10fold cv per weight.
+NetTepi_MHCpan.results = fread("Analysis_HLA_specific_Pathogenic/NetTepi_netMHCpan4_Balanced_stdData_Analysis_A201/NetTepi_netMHCResults_FULL_T_EXPLORATION_DATA.csv")
+
+```
+
+```{r NetTepi_weights_metrics,message=FALSE,warning=FALSE}
+
+# Munge the data: firstly filter data only for 10fold cv for the optimum weight, deselect irrelevant column and join with the full original dataset.
+NetTepi_NetMHCresults.benchmark=NetTepi_MHCpan.results %>% select(
+  !c(Tcell,Pos,ID,core,icore,Score,nM,Rank,Ave,NB,tWeight)) %>% inner_join(FullDataset) %>% mutate(Dataset="NETTEPI_netMHCpan4")
+
+NetTepi_NetMHCresults.benchmark=NetTepi_NetMHCresults.benchmark %>% unique
+
+NetTepi_NetMHCresults.benchmark=NetTepi_NetMHCresults.benchmark %>% dplyr::rename(ImmunogenicityScore=CombinedScore)
+# Make binary classification per fold by computing an optimal threshold.
+NetTepi_NetMHCresults.benchmark=NetTepi_NetMHCresults.benchmark  %>% mutate(ImmunogenicityPrediction = ifelse(
+  ImmunogenicityScore >= coords(roc=roc(Immunogenicity ~ ImmunogenicityScore), x="best", input="threshold", best.method="youden", transpose=F)$threshold,"Positive","Negative"))
+
+
+```
+
+# Compile all results
+- perform some final munging so to rbind each individual model's results into 'combinedData'.
+- Show combinedData
+
+```{r ,fig.width=8,fig.height=6,message=FALSE,warning=FALSE}
+# Select only key bits of each dataset and combine
+NetTepi_CV_FULL_RESULTS =NetTepi_CV_FULL_RESULTS %>% select(Fold,Peptide,HLA_Allele,ImmunogenicityScore,Immunogenicity,ImmunogenicityPrediction,Dataset)
+
+IEDB_RESULTS = IEDB_RESULTS %>% select(Fold,Peptide,HLA_Allele,ImmunogenicityScore,Immunogenicity,ImmunogenicityPrediction,Dataset)
+IPRED_CV_FULL_RESULTS = IPRED_CV_FULL_RESULTS %>% select(Fold,Peptide,HLA_Allele,ImmunogenicityScore,Immunogenicity,ImmunogenicityPrediction,Dataset)
+REPITOPE.RESULTS=REPITOPE.RESULTS %>% select(Fold,Peptide,HLA_Allele,ImmunogenicityScore,Immunogenicity,ImmunogenicityPrediction,Dataset)
+NetTepi_NetMHCresults.benchmark = NetTepi_NetMHCresults.benchmark%>% select(Fold,Peptide,HLA_Allele,ImmunogenicityScore,Immunogenicity,ImmunogenicityPrediction,Dataset)
+
+IEDB_RESULTS = IEDB_RESULTS %>% as.data.table
+IPRED_CV_FULL_RESULTS = IPRED_CV_FULL_RESULTS %>% as.data.table
+
+NetTepi_NetMHCresults.benchmark=NetTepi_NetMHCresults.benchmark %>% select(Fold,Peptide,HLA_Allele,ImmunogenicityScore,Immunogenicity,ImmunogenicityPrediction,Dataset)
+
+NetTepi_NetMHCresults.benchmark = NetTepi_NetMHCresults.benchmark %>% as.data.table
+REPITOPE.RESULTS = REPITOPE.RESULTS %>% as.data.table
+combinedData=rbind(NetTepi_CV_FULL_RESULTS,IEDB_RESULTS,IPRED_CV_FULL_RESULTS,NetTepi_NetMHCresults.benchmark,REPITOPE.RESULTS) %>% as.data.table
+
+DT::datatable(combinedData)
+# saveRDS(combinedData,"HLASpecific_combinedData.rds")
+```
+
+## Produce ROC-AUC
+
+```{r CVAUC,fig.width=8,fig.height=6,message=FALSE,warning=FALSE,dev='svg'}
+
+# Produce roc curves for each model 
+NETTEPIAUC=roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'NETTEPI'))
+IPREDAUC=roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'IPRED'))
+IEDBMODELAUC=roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'IEDB'))
+REPITOPE_AUC_CV=roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'REPITOPE'))
+NetTepi_NETMHC.AUC.CV = roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'NETTEPI_netMHCpan4'))
+
+# Use GGROC to combine and visualise the ROC-AUC curves
+roc.AUC=ggroc(list(IEDB_Model=IEDBMODELAUC,iPred=IPREDAUC,NetTepi=NETTEPIAUC,NetTepi_NetMHCpan4=NetTepi_NETMHC.AUC.CV,REpitope=REPITOPE_AUC_CV),legacy.axes = TRUE,size=1.25) + theme_bw() +
+  annotate("size"=5,"text",x=.55,y=.185,label=paste0("IEDB:     ",round(auc(IEDBMODELAUC),digits=3),"\n","iPred:     ",round(auc(IPREDAUC),digits=3),"\n","NetTepi: ",round(auc(NETTEPIAUC),digits=3),"\n","NetTepi_NetMHCpan4: ",round(auc(NetTepi_NETMHC.AUC.CV),digits=3),"\n","Repitope: ",round(auc(REPITOPE_AUC_CV),digits=3))) + font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.title",color="white") + font("legend.text",size=12) + geom_abline(intercept = 0, slope = 1,color = "darkgrey", linetype = "dashed",size=1)
+ roc.AUC
+```

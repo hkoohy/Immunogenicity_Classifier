@@ -1,0 +1,125 @@
+---
+title: "Further_data_associated_complexities"
+author: "PBUCKLEY"
+date: "20/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(dplyr)
+library(purrr)
+library(tidyverse)
+library(ggpubr)
+library(Biostrings)
+```
+
+# Fig 5A-C : Read in data
+- Read in IEDB model training data
+
+```{r}
+iedbmodel_training = fread("IEDB_CALIS_TRAINING_DATA.csv") %>% dplyr::rename(HLA_Allele=MHC) %>% mutate(Immunogenicity = ifelse(Immunogenicity=="immunogenic","Positive","Negative")) %>% filter(
+  width(Peptide)==9
+)
+iedbmodel_training[iedbmodel_training$Species=='Homo',]$Species='Human'
+
+```
+
+# Fig 5A
+
+```{r,message=FALSE,warning=FALSE,fig.height=6,fig.width=5,message=FALSE}
+filtered_iedbmodel_human = iedbmodel_training %>% filter(Species %in% 'Human')
+
+table(filtered_iedbmodel_human$Immunogenicity) %>% as.data.table %>% dplyr::rename(Immunogenicity=V1)%>% ggbarplot(x="Immunogenicity",y="N",color="Immunogenicity",fill="Immunogenicity",width = 0.4,label = TRUE,position = position_dodge2())  + ylab("Number of Peptides")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+ font("legend.title",size=16)  + font("legend.text",size=14)+font("xy.text",size=14)  + xlab("\nImmunogenicity Classification")
+
+```
+
+# Fig 5B
+
+```{r,fig.width=9,fig.height=6,dev='svg'}
+table(iedbmodel_training$HLA_Allele,iedbmodel_training$Species) %>% as.data.table %>% arrange(desc(N)) %>% dplyr::rename(
+  Species=V2
+)%>% ggbarplot(x="V1",y="N",fill="Species",x.text.angle=90) + xlab("\nHLA Allele") + ylab("Number of Peptides")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+ font("legend.title",size=16)  + font("legend.text",size=14)+font("xy.text",size=14) 
+```
+
+# Fig 5C
+
+```{r,fig.width=9,fig.height=6,message=FALSE,warning=FALSE,dev='svg'}
+iedbmodel_training %>% select(HLA_Allele,Immunogenicity) %>% table %>% as.data.table %>% arrange(desc(N)) %>% ggbarplot(x="HLA_Allele",y="N",fill="Immunogenicity") + xlab("\nHLA Allele")+rotate_x_text(angle=90) + ylab("Number of Peptides")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+ font("legend.title",size=16)  + font("legend.text",size=14)+font("xy.text",size=14) 
+```
+
+# Fig 5D-F : Read in data
+
+```{r}
+# Read in Pan HLA dataset
+combinedData = readRDS("Analysis_Pan_HLA_Pathogenic/PanHLA_combinedData.rds")
+FullDataset = readRDS("Analysis_Pan_HLA_Pathogenic/PanHLA_FullDataset.rds")
+combinedData = combinedData %>% inner_join(FullDataset)
+combinedData=combinedData %>% mutate(HLASuper = str_extract(HLA_Allele,"HLA-[A-Z]"))
+combinedData=combinedData %>% mutate(Viral = ifelse(AntigenOrganism %in% grep("virus",AntigenOrganism,value = T),"VIRUS","NOT VIRUS\n/UNKNOWN" ))
+
+combinedData[combinedData$AntigenOrganism=="|Homo sapiens",]$AntigenOrganism = 'Homo sapiens'
+combinedData[combinedData$AntigenOrganism=="|Mycobacterium tuberculosis",]$AntigenOrganism = 'Mycobacterium tuberculosis'
+
+
+```
+
+# Fig 5D
+
+```{r,fig.height=9,fig.width=9}
+mycomparisons = list(c("HLA-A","HLA-B"))
+combinedData %>% ggviolin(x="HLASuper",y="ImmunogenicityScore",add=c("boxplot"),fill="HLASuper")+facet_wrap(~Dataset)+ylim(-1,1.3)+ stat_compare_means(label="p.signif",label.x.npc = 0.5,comparisons = mycomparisons,label.y=1.22)+xlab("HLA Supertype")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+ font("legend.title",size=16)  + font("legend.text",size=14)+font("xy.text",size=16)+
+     theme(strip.text.x = element_text(size = 16),
+           strip.text.y = element_text(size = 16),
+                   axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+```
+
+# Fig 5E
+
+```{r,fig.height=9,fig.width=9}
+mycomparisons = list(c("NOT VIRUS\n/UNKNOWN","VIRUS"))
+
+combinedData %>% ggviolin(x="Viral",y="ImmunogenicityScore",add=c("boxplot"),fill="Viral")+facet_wrap(~Dataset)+ylim(-1,1.3)+ stat_compare_means(label="p.signif",label.x.npc = 0.5,comparisons = mycomparisons,label.y=1.22)+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+ font("legend.title",size=16)  + font("legend.text",size=14)+font("xy.text",size=16)+
+     theme(strip.text.x = element_text(size = 16),
+           strip.text.y = element_text(size = 16),
+                   axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+```
+
+# Fig 5F
+
+```{r,fig.height=9,fig.width=9}
+
+combinedData=combinedData %>% mutate(VACCINIA = ifelse(grepl("Vaccinia virus",AntigenOrganism),"VACCINIA","NOT\nVACCINIA"))
+
+mycomparisons = list(c("NOT\nVACCINIA","VACCINIA"))
+
+combinedData %>% ggviolin(x="VACCINIA",y="ImmunogenicityScore",add=c("boxplot"),fill="VACCINIA")+facet_wrap(~Dataset)+ylim(-1,1.3)+ stat_compare_means(label="p.signif",label.x.npc = 0.5,comparisons = mycomparisons,label.y=1.22)+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+ font("legend.title",size=16)  + font("legend.text",size=14)+font("xy.text",size=16)+
+     theme(strip.text.x = element_text(size = 16),
+           strip.text.y = element_text(size = 16),
+                   axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

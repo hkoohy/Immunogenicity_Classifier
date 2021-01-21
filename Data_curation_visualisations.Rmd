@@ -1,0 +1,145 @@
+---
+title: "Data_curation_visualisations"
+author: "PBUCKLEY"
+date: "20/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(dplyr)
+library(purrr)
+library(tidyverse)
+library(ggpubr)
+library(Biostrings)
+```
+
+```{r,dev='svg',fig.height=6,fig.width=6}
+
+FullDataset=fread("Datasets_csv/standardDataset_200903_PB_Inc_ImmunogenicityEvidence.csv")  %>% mutate(Peptide = toupper(Peptide)) 
+
+ FullDataset=FullDataset %>% separate_rows(MHCrestrictions,sep="[|]")
+# #
+ FullDataset$MHCrestrictions = gsub(",",FullDataset$MHCrestrictions,replacement = "")
+ FullDataset$AntigenName = gsub(",",FullDataset$AntigenName,replacement = "")
+ FullDataset$AntigenOrganism = gsub(",",FullDataset$AntigenOrganism,replacement = "")
+FullDataset$HostOrganism= gsub(",",FullDataset$HostOrganism,replacement = "")
+
+```
+
+# Fig 1B
+- Integration of the below two figures
+- MHC and HLAs in standardData
+
+```{r,dev='svg',fig.height=6,fig.width=6}
+
+FullDataset=FullDataset%>% filter(MHCType %in% 'MHC-I')
+FullDataset %>% select(MHCType,Immunogenicity) %>% table %>% as.data.table  %>% ggbarplot(x="MHCType",y="N",fill="Immunogenicity",position=position_dodge2()) + ylab("Number of Peptides")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+ font("legend.title",size=16)  + font("legend.text",size=14)+font("xy.text",size=14) + xlab("MHC Class")
+
+```
+
+```{r,dev='svg',fig.height=6,fig.width=6}
+
+ HLA.TO.FILTER=FullDataset %>% select(MHCrestrictions) %>% table %>% as.data.table %>% arrange(desc(N)) %>% head(25)
+ 
+ FullDataset %>% filter(MHCrestrictions %in% HLA.TO.FILTER$.) %>% select(Immunogenicity,MHCrestrictions)  %>% table %>% as.data.table  %>% ggbarplot(x="MHCrestrictions",y="N",fill="Immunogenicity",position = position_dodge2()) + coord_flip() + ylab("Number of Peptides")+xlab("HLA Allele\n")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+ font("legend.title",size=16)  + font("legend.text",size=14)+font("xy.text",size=14) 
+ 
+```
+
+# Cleaning to produce Fig 1C
+- Based on Pan HLA dataset
+
+```{r}
+
+# Read in Pan HLA dataset
+FullDataset = readRDS("Analysis_Pan_HLA_Pathogenic/PanHLA_FullDataset.rds")
+
+# Clean up for visualisation
+FullDataset[FullDataset$AntigenOrganism=="|Homo sapiens",]$AntigenOrganism = 'Homo sapiens'
+FullDataset[FullDataset$AntigenOrganism=="|Mycobacterium tuberculosis",]$AntigenOrganism = 'Mycobacterium tuberculosis'
+FullDataset[FullDataset$AntigenOrganism=="",]$AntigenOrganism = 'Undefined'
+FullDataset[FullDataset$AntigenName=="",]$AntigenName = 'Undefined'
+FullDataset$HostOrganism= stringr::str_wrap(FullDataset$HostOrganism,40)
+FullDataset[FullDataset$HostOrganism=="",]$FullDataset = 'Undefined'
+FullDataset$AntigenOrganism= stringr::str_wrap(FullDataset$AntigenOrganism,40)
+
+```
+
+# Fig 1C
+- Based on Pan HLA dataset
+
+```{r,dev='svg',fig.width=8,fig.height=8}
+TOP_HOSTS=FullDataset %>% select(AntigenOrganism) %>% table %>% as.data.table %>% arrange(desc(N)) %>% head(20)
+
+FullDataset %>% filter(AntigenOrganism %in% TOP_HOSTS$.) %>% select(AntigenOrganism,Immunogenicity) %>% table %>% data.table %>% arrange(desc(N)) %>% ggbarplot(x="AntigenOrganism",y="N",fill="Immunogenicity",position=position_dodge2()) + coord_flip() + ylab("Number of Peptides") +xlab("Antigen Organism")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+ font("legend.title",size=16)  + font("legend.text",size=14)+font("xy.text",size=14)+rotate_x_text(angle=90) +theme(legend.position = c(0.6,0.94))
+
+```
+
+# Fig 1D
+- Based on Pan HLA dataset
+
+```{r,dev='svg',fig.width=8,fig.height=7}
+TOP_HOSTS=FullDataset %>% select(AntigenName)%>% table %>% as.data.table %>% arrange(desc(N))%>% head(20)
+
+FullDataset %>% filter(AntigenName %in% TOP_HOSTS$.) %>% select(AntigenName,Immunogenicity) %>% table %>% data.table %>% arrange(desc(N))  %>% ggbarplot(x="AntigenName",y="N",fill="Immunogenicity",position = position_dodge2()) + coord_flip() + ylab("Number of Peptides") +xlab("Antigen Name")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+ font("legend.title",size=16)  + font("legend.text",size=14)+font("xy.text",size=14)+rotate_x_text(angle=90) +theme(legend.position = c(0.6,0.94))
+```
+
+# Fig 1E
+- HLA allele distribution in Pan HLA dataset
+
+```{r,message=FALSE,warning=FALSE,dev='svg',fig.width=6,fig.height=6}
+
+FullDataset %>% select(Immunogenicity,HLA_Allele) %>% table %>% as.data.table %>% arrange(desc(N)) %>% ggbarplot(x="HLA_Allele",y="N",fill="Immunogenicity",position = position_dodge2()) + coord_flip() + ylab("Number of Peptides")+xlab("HLA Allele\n")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+ font("legend.title",size=16)  + font("legend.text",size=14)+font("xy.text",size=14) 
+
+
+```
+
+# Clean GBM data for Fig 1F
+- Peptide immunogenicity in GBM dataset
+
+```{r}
+# Import GBM data
+FullDataset = fread("GBM_Benchmark_PanHLA_Train/GBM_Peptides.tsv")
+# Clean dataset and change immunogenicity = not detected | positive to 'Negative' | 'Positive'
+
+FullDataset=FullDataset %>% select(Norm_peptide,Mut_peptide,HLA_allele,Mismatches,tcell_response_updatedNov19) %>% dplyr::rename(
+  Peptide=Mut_peptide,HLA_Allele=HLA_allele,Immunogenicity=tcell_response_updatedNov19) %>% mutate(
+    Immunogenicity = ifelse(Immunogenicity=='positive','Positive','Negative'))
+
+# contradictory peptide is classed pve
+FullDataset[FullDataset$Peptide == 'SLHLDAWTI' & FullDataset$Immunogenicity == 'Negative',]$Immunogenicity = 'Positive'
+FullDataset=FullDataset %>% unique
+# Filter 9mers
+FullDataset=FullDataset %>% filter(width(Peptide)==9)
+FullDataset = FullDataset %>% select(!c(Mismatches))
+
+```
+
+# Fig 1F
+
+```{r, fig.width=4,fig.height=5,dev='svg'}
+
+ FullDataset %>% select(Immunogenicity,HLA_Allele) %>% table %>% as.data.table %>% ggbarplot(x="Immunogenicity",y="N",fill="Immunogenicity",label=T,width=0.5) + ylab("Number of Peptides") + xlab("Immunogenicity Classification")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")  + font("legend.text",size=10) + labs(fill="Immunogenicity")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

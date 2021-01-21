@@ -1,0 +1,251 @@
+Peptide,Immunogenicity,HLA_Allele,HostOrganism,AntigenOrganism,AntigenName,ImmunogenicityScore
+MLNGTTLEA,Negative,HLA-A02:01,Homo sapiens,,LIM/homeobox protein Lhx9 isoform 2 [Homo sapiens],0.588312974681056
+MQLFHLCLI,Negative,HLA-A02:01,Homo sapiens,,HBeAg [HBV genotype B],0.306980349747736
+STGMTPEKV,Negative,HLA-A02:01,Homo sapiens,,melanocyte-specific secreted glycoprotein partial,0.260476502624924
+ALPDSLTQV,Negative,HLA-A02:01,Homo sapiens,,transcription factor RFX4 [Homo sapiens],0.597941619360594
+FVAVHPVDV,Negative,HLA-A02:01,Homo sapiens,Human gammaherpesvirus 8,Protein K12,0.700976692369202
+MLGNAPSVV,Negative,HLA-A02:01,Homo sapiens,Mycobacterium tuberculosis,mtp40 protein - Mycobacterium tuberculosis,0.591966056987649
+ILVCYILYI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein A36 precursor,0.12490196062203
+TYLEKAIKI,Negative,HLA-A02:01,Homo sapiens,,ubiquitin carboxyl-terminal hydrolase 7,0.519694103723725
+LLTPNEFEI,Negative,HLA-A02:01,Homo sapiens,Human adenovirus 5|Human mastadenovirus C,Hexon protein,0.532353495338927
+IVQENNGAV,Negative,HLA-A02:01,Homo sapiens,,cysteine proteinase cruzipain (EC 3.4.22.-) - Trypanosoma cruzi,0.428178097613692
+DLSRDLDSV,Negative,HLA-A02:01,Homo sapiens,Human betaherpesvirus 6B,antigenic virion protein,0.423005889221429
+NPVTIINEY,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,,0.283512951541579
+HLIMIYFFI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,hypothetical protein m8LTR05R,0.0448705976806111
+ANFSFRNTL,Negative,HLA-A02:01,Homo sapiens,,tyrosinase,0.521743432763119
+TVLEYLVSF,Negative,HLA-A02:01,Homo sapiens,,HBeAg [HBV genotype B],0.489481059080573
+IVAWFLLLI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Uncharacterized 7.9 kDa protein,0.156344664557746
+AIHNVVHAI,Negative,HLA-A02:01,Homo sapiens,Gluten from Triticum aestivum|Triticum aestivum,Alpha/beta-gliadin A-I precursor,0.298860367566577
+YIFTGPVPI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein E8,0.606501131332032
+ALFYKDGKL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,DNA topoisomerase 1B,0.483510674664331
+VVWVKITQV,Negative,HLA-A02:01,Homo sapiens,Leishmania major,elongation initiation factor 2 alpha subunit,0.347358062518921
+VLLLVVVMM,Negative,HLA-A02:01,Homo sapiens,,FL-160-2 protein - Trypanosoma cruzi,0.542691019537509
+GLKRGPSTE,Negative,HLA-A02:01,Homo sapiens,Influenza A virus,matrix protein 2,0.294331233847892
+VLQQSTYQL,Negative,HLA-A02:01,Homo sapiens,Gluten from Triticum aestivum|Triticum aestivum,Alpha/beta-gliadin A-I precursor,0.401776603899749
+ILFVVIVGL,Negative,HLA-A02:01,Homo sapiens,Human alphaherpesvirus 1,glycoprotein D|Glycoprotein D precursor,0.199161615643416
+NCTERRLLV,Negative,HLA-A02:01,Homo sapiens,,tyrosinase,0.937261177365677
+ALLSDWLPA,Negative,HLA-A02:01,Homo sapiens,Mycobacterium tuberculosis,Enoyl-[acyl-carrier-protein] reductase [NADH],0.789723455729382
+KISYYIPYV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,,0.319272600882993
+YLNAVSLCI,Negative,HLA-A02:01,Homo sapiens,Yellow fever virus 17D,Genome polyprotein,0.437270568868096
+FIVLILLLL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein I2,0.0708329184242585
+VLLEQMGSL,Negative,HLA-A02:01,Homo sapiens,,SMCY,0.546744292431471
+FVVFILIYV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein L5,0.0468185782382067
+ITGSLGPLL,Negative,HLA-A02:01,Homo sapiens,,melanocyte-specific secreted glycoprotein partial,0.679335324045454
+AGVASADPV,Negative,HLA-A02:01,Homo sapiens,,LOW MOLECULAR WEIGHT T-CELL ANTIGEN TB8.4 (Hypothetical protein),0.616052478555119
+FILFFAYVM,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Virion membrane protein A17L,0.0933878215087456
+KISDRYYLL,Negative,HLA-A02:01,Homo sapiens,,LIM/homeobox protein Lhx9 isoform 2 [Homo sapiens],0.437836312299129
+KTMAVTYEL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,putative C ORF A,0.500235844611868
+HLLEEQSPI,Negative,HLA-A02:01,Homo sapiens,,transcription factor RFX4 [Homo sapiens],0.552154454553965
+YLSAKITTL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Uncharacterized 9.3 kDa protein,0.454823085532311
+YAQDYDQYI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,p4b precursor of core protein 4b,0.253598479808476
+HLMFDDYVL,Negative,HLA-A02:01,Homo sapiens,,transcription factor RFX4 [Homo sapiens],0.488218406363608
+AMFTAALNI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Virion membrane protein M25,0.426914023114808
+YAYGWIPET,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein E8,0.753860746771285
+FLTGTFVTA,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,IMV heparin binding surface protein|J3L protein,0.611979849060071
+ILQNRLVYV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein A52,0.337266964074563
+HLMFYTLPI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein C1,0.396536109744683
+DLVLKRCLL,Negative,HLA-A02:01,Homo sapiens,,melanocyte-specific secreted glycoprotein partial,0.716245331659113
+FLPVYFGSV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein A20,0.496912861755404
+MLLHVGIPL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Uncharacterized 7.9 kDa protein,0.481506579238769
+RAKAVRALK,Negative,HLA-A02:01,Homo sapiens,,nascent polypeptide-associated complex subunit alpha-2,0.741525224817413
+GLSIGTGRA,Negative,HLA-A02:01,Homo sapiens,,melanocyte-specific secreted glycoprotein partial,0.846747192609833
+SLLVIWILI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Myristoylated protein G9,0.22132496304736
+LVLPSIPSV,Negative,HLA-A02:01,Homo sapiens,,hCG1653259,0.73826319388716
+FIDTVSVYT,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein C8,0.369044060173985
+ITINYFLLL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,F3 polypeptide,0.166332471912334
+MLGIWFFTL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Uncharacterized 14.4 kDa protein,0.477614274755404
+FLSIVVDHV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,DNA topoisomerase 1,0.528972356067395
+ALLMYNLLT,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Uncharacterized 8.1 kDa protein,0.428181286781129
+LLMTGGVTL,Negative,HLA-A02:01,Homo sapiens,Yellow fever virus 17D,Genome polyprotein,0.677701041673309
+FLSRVFFCV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Viral late gene transcription factor 2,0.479617389424756
+LILSLTCSV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Serine proteinase inhibitor 3,0.5473086950767
+FLICHNLRA,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Uncharacterized 14.1 kDa protein,0.632299232464738
+ALGIVSPRV,Negative,HLA-A02:01,Homo sapiens,,pIIIpenton protein,0.489571377058645
+WLRLPRIFC,Negative,HLA-A02:01,Homo sapiens,,Pmel 17,0.845947675284178
+GTYAVNIHV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,DNA-directed RNA polymerase 132 kDa polypeptide,0.478759064277612
+KLIGITAIM,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein F1,0.453368990964607
+YLASHYEKL,Negative,HLA-A02:01,Homo sapiens,,type II CRISPR RNA-guided endonuclease Cas9 [Streptococcus pyogenes],0.520333131422993
+LPDGQVIWV,Negative,HLA-A02:01,Homo sapiens,,melanocyte-specific secreted glycoprotein partial,0.5924293005997
+PLGPQFPFT,Negative,HLA-A02:01,Homo sapiens,,tyrosinase,0.758170004883445
+YLCEAMLNT,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,DNA-dependent RNA polymerase subunit rpo147,0.58774442149018
+ALHIYMNGT,Negative,HLA-A02:01,Homo sapiens,,tyrosinase,0.506339432134369
+YIIKKNDIV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,mRNA capping enzyme large subunit,0.213699017170484
+AQLDAVLSA,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Virion membrane protein M25,0.685457787092218
+FLLLYTIIV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,F3 polypeptide,0.131693681955497
+DSTQTTTQK,Negative,HLA-A02:01,Homo sapiens,,nascent polypeptide-associated complex subunit alpha-2,0.186693733463423
+KVVDELVKV,Negative,HLA-A02:01,Homo sapiens,,type II CRISPR RNA-guided endonuclease Cas9 [Streptococcus pyogenes],0.66957452803712
+FLAVLSPTI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein C1,0.494380597158245
+AIILVIFTV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,S-S bond formation pathway protein,0.0513982369698684
+RLHLWLSDM,Negative,HLA-A02:01,Homo sapiens,,FL-160-2 protein - Trypanosoma cruzi,0.646899094295031
+PVVPNAPPA,Negative,HLA-A02:01,Homo sapiens,,melanoma antigen recognized by T-cells 1,0.920692866097649
+TVQEFIFSA,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Hypothetical protein VACWR082,0.340789221312451
+GLTFKGPGA,Negative,HLA-A02:01,Homo sapiens,,FL-160-2 protein - Trypanosoma cruzi,0.774442233766148
+KIGPPTVTL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein B8 precursor,0.549480511146846
+EMKYALINL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Assembly protein G7,0.518590532958808
+LIDNPDNNL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,DNA-directed RNA polymerase 147 kDa polypeptide,0.523299404667525
+VLPAVVYST,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Plaque-size/host range protein precursor,0.527494817669135
+KVPRNQDWL,Negative,HLA-A02:01,Homo sapiens,,melanocyte-specific secreted glycoprotein partial,0.436628843005597
+LLDLFGPEV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Transcript release DNA helicase,0.505673523714082
+TINDLKMML,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein A31,0.426167860209447
+MTPAEVSIV,Negative,HLA-A02:01,Homo sapiens,,melanocyte-specific secreted glycoprotein partial,0.456457651894714
+LLFLGVVFL,Negative,HLA-A02:01,Homo sapiens,Mycobacterium tuberculosis,tuberculin-like peptide,0.265972942485657
+YMATTILEM,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,DNA topoisomerase 1,0.583812050825113
+KLYLVDYGL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Serine/threonine-protein kinase 1,0.442317978748531
+SIFGFQAEV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,unknown,0.455128161650787
+VLADANETL,Negative,HLA-A02:01,Homo sapiens,Human rotavirus A|Rotavirus A,VP6 protein,0.623571073023344
+FMGAGSKAV,Negative,HLA-A02:01,Homo sapiens,Trypanosoma cruzi,surface protein-1,0.737644563188205
+KLDKEMEAV,Negative,HLA-A02:01,Homo sapiens,Human betaherpesvirus 6B,IE-A transactivator,0.5989089813393
+ILDSFEPLR,Negative,HLA-A02:01,Homo sapiens,Hepacivirus C|Hepatitis C virus genotype 3,polyprotein precursor,0.575444839004561
+RAVWTIIFI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Probable FAD-linked sulfhydryl oxidase E10,0.163742155883433
+PIGENSPLL,Negative,HLA-A02:01,Homo sapiens,,Pmel 17,0.667713928154517
+WLGETFHGL,Negative,HLA-A02:01,Homo sapiens,Francisella tularensis|Francisella tularensis subsp. tularensis SCHU S4,hypothetical protein FTT1709,0.611147921921646
+LLYILRYIV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Ankyrin repeat protein B18,0.236400051486038
+RMATMLEYV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Poly(A) polymerase catalytic subunit,0.6589530304948
+RIILNGSLL,Negative,HLA-A02:01,Homo sapiens,,FL-160-2 protein - Trypanosoma cruzi,0.466630078682504
+RVFVILYLL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,36 kDa major membrane protein precursor,0.263844672996808
+FMYFCEQKL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein A9,0.33716300066369
+VISVIFYFI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein A16,0.0284518617312101
+SLYNVVATL,Negative,HLA-A02:01,Homo sapiens,Human immunodeficiency virus 1,,0.452772653489851
+GLRDCTMLV,Negative,HLA-A02:01,Homo sapiens,Hepacivirus C|Hepatitis C virus subtype 1a,unnamed protein product,0.81284855676896
+WMTYTGGVM,Negative,HLA-A02:01,Homo sapiens,,cysteine proteinase cruzipain (EC 3.4.22.-) - Trypanosoma cruzi,0.947681356430571
+KLSFSIVSL,Negative,HLA-A02:01,Homo sapiens,,DAPK2 protein,0.528252327473253
+ILPVIFLSI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Interleukin-1-binding protein precursor,0.151317335632555
+LQDSVDFSL,Negative,HLA-A02:01,Homo sapiens,,vimentin,0.571009590981323
+LILLLLIYL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein I2,0.107263642296708
+YLVTSINKL,Negative,HLA-A02:01,Homo sapiens,Human betaherpesvirus 6B,antigenic virion protein,0.380028620864408
+QLMAEKLQL,Negative,HLA-A02:01,Homo sapiens,,Myosin-9,0.542576795213737
+ILVILFFGV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein I6,0.139970082924078
+VLTTDGFYI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Early transcription factor 82 kDa subunit,0.536677500316203
+KLTELNAEL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,cowpox A-type inclusion protein,0.696878133746249
+AMFTTMYNI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Structural protein VP8 precursor,0.44055079653082
+SLYATVATL,Negative,HLA-A02:01,Homo sapiens,Human immunodeficiency virus 1,,0.500670376849707
+GLFGKGSLV,Negative,HLA-A02:01,Homo sapiens,Dengue virus|Dengue virus 3,envelope protein,0.787743908010602
+VLMAVVLAS,Negative,HLA-A02:01,Homo sapiens,,melanocyte-specific secreted glycoprotein partial,0.585269283944438
+CLKMLLEKL,Negative,HLA-A02:01,Homo sapiens,,Genome polyprotein,0.366723952128496
+KINIFMAFL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Late transcription factor 1|Late transcription factor VLTF-1,0.205041756269822
+VIFVCVILI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,putative F ORF D,0.0493938825175996
+RMPAVTDLV,Negative,HLA-A02:01,Homo sapiens,Mycobacterium tuberculosis,DnaK,0.56753928883798
+IIGAGPAEV,Negative,HLA-A02:01,Homo sapiens,,,0.690415760602825
+FVIVIYIFT,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,unknown,0.0290971475322901
+GVGAVAMSL,Negative,HLA-A02:01,Homo sapiens,,LOW MOLECULAR WEIGHT T-CELL ANTIGEN TB8.4 (Hypothetical protein),0.779676007527224
+NIVDAIITL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,unknown,0.143550288682632
+VLNDQYAKV,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,VACAC2_079,0.452282335431363
+MTYTGGVMT,Negative,HLA-A02:01,Homo sapiens,,cysteine proteinase cruzipain (EC 3.4.22.-) - Trypanosoma cruzi,0.860279395478522
+FMNLYSFTI,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Uncharacterized 8.5 kDa protein,0.292414349300005
+SLLKSLLLL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein A47,0.52897397343322
+RLNDFLGLL,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Structural protein VP8 precursor,0.569407318170262
+FLVFVKPTT,Negative,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,DNA-dependent RNA polymerase subunit rpo147,0.437422286274744
+SLFNTVATL,Positive,HLA-A02:01,Homo sapiens|Homo sapiens Caucasian|Homo sapiens|Homo sapiens Caucasian,|Human immunodeficiency virus 1,gag polyprotein|gag protein|Gag protein|gag partial [Human immunodeficiency virus 1],0.499973927921666
+SLFGQRIEV,Positive,HLA-A02:01,Homo sapiens,West Nile virus,nonstructural protein 4B,0.510825707030708
+TMLEDHEFV,Positive,HLA-A02:01,Homo sapiens,Human alphaherpesvirus 1|Human alphaherpesvirus 1|Human alphaherpesvirus 2,envelope glycoprotein B|Glycoprotein B,0.497377966146776
+AMAAQLQAV,Positive,HLA-A02:01,Homo sapiens,,LOW MOLECULAR WEIGHT T-CELL ANTIGEN TB8.4 (Hypothetical protein),0.554173514618351
+GWVESDAAH,Positive,HLA-A02:01,Homo sapiens,,Alanine and proline-rich secreted protein apa precursor,0.432036851423825
+YIIIGDSPV,Positive,HLA-A02:01,Homo sapiens,,,0.337756593165639
+KLQVFLIVL,Positive,HLA-A02:01,Homo sapiens,,Islet amyloid polypeptide precursor,0.270234609083239
+TLLDALGML,Positive,HLA-A02:01,Homo sapiens,Leishmania major,elongation factor 1-alpha,0.527180900976618
+WLGNIIMFA,Positive,HLA-A02:01,Homo sapiens,Hepacivirus C|Hepatitis C virus subtype 1a,polyprotein,0.489008708918166
+YLFDFVISL,Positive,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Protein J1|putative J1R,0.286100073645163
+FLEIYTVTV,Positive,HLA-A02:01,Homo sapiens,,,0.398628275747346
+FLLSLGIHL,Positive,HLA-A02:01,Homo sapiens,|Hepatitis B virus,pol protein|polymerase|Polymerase|Protein P,0.43966612135189
+GMNVANHFL,Positive,HLA-A02:01,Homo sapiens,Mumps rubulavirus,I protein [Mumps virus genotype G],0.50908225114789
+MLLAVLYCL,Positive,HLA-A02:01,Homo sapiens,|Homo sapiens,tyrosinase,0.379088463000528
+SLFNTVATV,Positive,HLA-A02:01,Homo sapiens Caucasian,Human immunodeficiency virus 1,gag protein,0.439663843725284
+GLCTLVAML,Positive,HLA-A02:01,Homo sapiens|Homo sapiens Caucasian|Homo sapiens|Homo sapiens Caucasian,|BMLF1 protein|FLRGRAYGL|Human gammaherpesvirus 4|Human herpesvirus 4 strain B95-8,BMLF1 protein|BSLF2/BMLF1 [Human gammaherpesvirus 4]|mRNA export factor EB2|Transcriptional regulator IE63 homolog,0.617717662703798
+KIIKLFFRL,Positive,HLA-A02:01,Homo sapiens,,GAD2 protein partial [Homo sapiens],0.35583676716568
+LLVDLAEEL,Positive,HLA-A02:01,Homo sapiens,,,0.765148749099602
+TMHSLTIQM,Positive,HLA-A02:01,Homo sapiens,|Homo sapiens,zinc transporter 8 isoform a,0.473685279720482
+FLGIYTVTV,Positive,HLA-A02:01,Homo sapiens,,olfactory receptor 8D4 [Homo sapiens],0.502076886963483
+KAANIVLTV,Positive,HLA-A02:01,Homo sapiens,,hypothetical protein [Bacteroides stercoris],0.443501967224226
+FLLALLSCL,Positive,HLA-A02:01,Homo sapiens,|Hepacivirus C,Genome polyprotein|structural protein,0.363592822513342
+AMLERQFTV,Positive,HLA-A02:01,Homo sapiens,,protein N-lysine methyltransferase METTL21A isoform 1,0.583504726141161
+SLQEKVAKA,Positive,HLA-A02:01,Homo sapiens,,hyaluronan-mediated motility receptor (RHAMM),0.596717814052317
+LMAVVLASL,Positive,HLA-A02:01,Homo sapiens,,melanocyte-specific secreted glycoprotein partial,0.588404821193578
+KVVSLVILA,Positive,HLA-A02:01,Homo sapiens,|Trypanosoma cruzi,FL-160-2 protein - Trypanosoma cruzi,0.44967452878515
+MMMLPATLA,Positive,HLA-A02:01,Homo sapiens,Dengue virus,polyprotein,0.401818170551941
+QLDPARDVL,Positive,HLA-A02:01,Homo sapiens,Hepatitis B virus,X protein,0.607315019514102
+ALAMEVYQA,Positive,HLA-A02:01,Homo sapiens,Mycobacterium bovis|Mycobacterium tuberculosis|Mycobacterium tuberculosis|Mycobacterium tuberculosis variant bovis BCG,PPE family protein PPE68,0.600143475304218
+GLGTLGAAL,Positive,HLA-A02:01,Homo sapiens,Human gammaherpesvirus 4,latent membrane protein 2|Latent membrane protein 2,0.881131563430742
+NLLVTGFDT,Positive,HLA-A02:01,Homo sapiens,Mycobacterium bovis|Mycobacterium tuberculosis|Mycobacterium tuberculosis|Mycobacterium tuberculosis variant bovis BCG,hypothetical glycine-rich protein Rv3812 - Mycobacterium tuberculosis (strain H37RV)|PE-PGRS family protein,0.604528039835893
+VMASLVWPV,Positive,HLA-A02:01,Homo sapiens,Hantaan orthohantavirus,Envelope glycoprotein precursor,0.751242187772312
+ALMGAVTSL,Positive,HLA-A02:01,Homo sapiens,Human alphaherpesvirus 1,capsid maturation protease,0.590745572006298
+SLAAGVKLL,Positive,HLA-A02:01,Homo sapiens,,Receptor-type tyrosine-protein phosphatase-like N precursor,0.648654378981704
+PLTQHYQIL,Positive,HLA-A02:01,Homo sapiens,,Protein E7,0.478710408237272
+ASPPSTAAA,Positive,HLA-A02:01,Homo sapiens,,Alanine and proline-rich secreted protein apa precursor,0.790060249199572
+CLNGVCWTV,Positive,HLA-A02:01,Homo sapiens,Hepacivirus C,polyprotein,0.921320928310811
+FLLIRYITT,Positive,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Uncharacterized 10.5 kDa protein,0.422788209749307
+GMFANRWII,Positive,HLA-A02:01,Homo sapiens,Mycobacterium tuberculosis,metal cation transporter P-type ATPase A CtpF,0.554423100307462
+AVIGALLAV,Positive,HLA-A02:01,Homo sapiens,,melanocyte-specific secreted glycoprotein partial,0.565700222354885
+ILNDEQLNL,Positive,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Early transcription factor 82 kDa subunit,0.535800528248526
+AILHTPGCV,Positive,HLA-A02:01,Homo sapiens,Hepacivirus C,structural protein,0.748301611863229
+ALRERRMKV,Positive,HLA-A02:01,Homo sapiens,Leishmania major,putative proteasome regulatory ATPase subunit 2,0.867338447683736
+KLNTITAVV,Positive,HLA-A02:01,Homo sapiens,,,0.390715840158653
+NGVRVLATA,Positive,HLA-A02:01,Homo sapiens,Human betaherpesvirus 5,fusion protein,0.613082666834009
+ALWGPDPAA,Positive,HLA-A02:01,Homo sapiens,,Insulin precursor|proinsulin precursor,0.742231021412293
+GGNGMLATI,Positive,HLA-A02:01,Homo sapiens,Human betaherpesvirus 5,GNAT family N-acetyltransferase,0.933951281444896
+VLFHRAFLV,Positive,HLA-A02:01,Homo sapiens,,,0.526763392652642
+TLRVLQDQL,Positive,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,DNA ligase,0.594572611529726
+MLLWTAVAV,Positive,HLA-A02:01,Homo sapiens,Leishmania major,excreted/secreted protein 37,0.621738473532975
+TLFTMVGTV,Positive,HLA-A02:01,Homo sapiens,,,0.646457639607883
+FMTALVLSL,Positive,HLA-A02:01,Homo sapiens,Human alphaherpesvirus 1,DNA packaging tegument protein UL25,0.475080665614919
+ILNAMIAKI,Positive,HLA-A02:01,Homo sapiens,,,0.275937490683406
+FAAAFFPAV,Positive,HLA-A02:01,Homo sapiens,Toxoplasma gondii,MIC2-associated protein precursor,0.499342987957752
+FLHCIVFNV,Positive,HLA-A02:01,Homo sapiens|Homo sapiens Caucasian,|Human polyomavirus 1|JC polyomavirus,large T antigen,0.330146004478496
+CVNGVCWTV,Positive,HLA-A02:01,Homo sapiens,|APITAYSQQTRGLLGCIITSLTGRDKNQVEGEVQVVSTATQSFLATCVNGVCWTVYHGAGSKTLAGPKGPITQMYTNVDQDLVGWQAPPGARSLTPCTCGSSDLYLVTRHADVIPVRRRGDSRGSLLSPRPVSYLKGSSGGPLLCPSGHAVGIFRAAVCTRGVAKAVDFVPVESMETTMRSPVFTDNSSPPAVPQSFQVAHLHAPTGSGKSTKVPAAYAAQGYKVLVLNPSVAATLGFGAYMSKAHGIDPNIRTGVRTITTGAPVTYSTYGKFLADGGCSGGAYDIIICDECHSTDSTTILGIGTVLDQAETAGARLVVLATATPPGSVTVPHPNIEEVALSNTGEIPFYGKAIPIEAIRGGRHLIFCHSKKKCDELAAKLSGLGINAVAYYRGLDVSVIPTIGDVVVVATDALMTGYTGDFDSVIDCNTCVTQTVDFSLDPTFTIETTTVPQDAVSRSQRRGRTGRGRRGIYRFVTPGERPSGMFDSSVLCECYDAGCAWYELTPAETSVRLRAYLNTPGLPVCQDHLEFWESVFTGLTHIDAHFLSQTKQAGDNFPYLVAYQATVCARAQAPPPSWDQMWKCLIRLKPTLHGPTPLLYRLGAVQNEVTLTHPITKYIMACMSADLEVVTSTWVLVGGVLAALAAYCLTTGSVVIVGRIILSGRPAIVPDRELLYQEFDEMEECATHLPYIEQGMQLAEQFKQKALGLLQTATKQAEAAAPVVESKWRALETFWAKHMWNFISGIQYLAGLSTLPGNPAIASLMAFTASITSPLTTQSTLLFNILGGWVAAQLAPPSAASAFVGAGIAGAAVGSIGLGKVLVDILAGYGAGVAGALVAFKVMSGEMPSTEDLVNLLPAILSPGALVVGVVCAAILRRHVGPGEGAVQWMNRLIAFASRGNHVSPTHYVPESDAAARVTQILSSLTITQLLKRLHQWINEDCSTPCSGSWLRDVWDWICTVLTDFKTWLQSKLLPQLPGVPFFSCQRGYKGVWRGDGIMQTTCPCGAQITGHVKNGSMRIVGPKTCSNTWHGTFPINAYTTGPCTPSPAPNYSRALWRVAAEEYVEVTRVGDFHYVTGMTTDNVKCPCQVPAPEFFSEVDGVRLHRYAPACRPLLREEVTFQVGLNQYLVGSQLPCEPEPDVAVLTSMLTDPSHITAETAKRRLARGSPPSLASSSASQLSAPSLKATCTTHHVSPDADLIEANLLWRQEMGGNITRVESENKVVVLDSFDPLRAEEDEREVSVPAEILRKSKKFPAAMPIWARPDYNPPLLESWKDPDYVPPVVHGCPLPPIKAPPIPPPRRKRTVVLTESSVSSALAELATKTFGSSESSAVDSGTATALPDQASDDGDKGSDVESYSSMPPLEGEPGDPDLSDGSWSTVSEEASEDVVCCSMSYTWTGALITPCAAEESKLPINALSNSLLRHHNMVYATTSRSAGLRQKKVTFDRLQVLDDHYRDVLKEMKAKASTVKAKLLSVEEACKLTPPHSAKSKFGYGAKDVRNLSSKAVNHIHSVWKDLLEDTVTPIDTTIMAKNEVFCVQPEKGGRKPARLIVFPDLGVRVCEKMALYDVVSTLPQVVMGSSYGFQYSPGQRVEFLVNTWKSKKNPMGFSYDTRCFDSTVTENDIRVEESIYQCCDLAPEARQAIKSLTERLYIGGPLTNSKGQNCGYRRCRASGVLTTSCGNTLTCYLKASAACRAAKLQDCTMLVNGDDLVVICESAGTQEDAASLRVFTEAMTRYSAPPGDPPQPEYDLELITSCSSNVSVAHDASGKRVYYLTRDPTTPLARAAWETARHTPVNSWLGNIIMYAPTLWARMILMTHFFSILLAQEQLEKALDCQIYGACYSIEPLDLPQIIERLHGLSAFSLHSYSPGEINRVASCLRKLGVPPLRVWRHRARSVRARLLSQGGRAATCGKYLFNWAVKTKLKLTPIPAASQLDLSGWFVAGYSGGDIYHSLSRARPRWFMLCLLLLSVGVGIYLLPNR|Hepacivirus C|Hepacivirus C|Influenza A virus|Hepatitis C virus (isolate Japanese)|Hepatitis C virus core matrix envelope and non-structural protein RNA.|Hepatitis C virus genotype 1|Hepatitis C virus subtype 1b,Genome polyprotein|Hepatitis C virus core matrix envelope and non-structural protein RNA.|non-structural protein 3|polyprotein,0.932903084637129
+LEATYASTL,Positive,HLA-A02:01,Homo sapiens,Leishmania donovani,3'-nucleotidase/nuclease,0.558985827629583
+HLMIDRPYV,Positive,HLA-A02:01,Homo sapiens,Measles morbillivirus,Hemagglutinin glycoprotein,0.547522125529477
+QLSTRGVQI,Positive,HLA-A02:01,Homo sapiens,Influenza A virus,nucleocapsid protein,0.455117264983496
+FILPVLGAV,Positive,HLA-A02:01,Homo sapiens,,Cadherin-3,0.441458221347709
+FMGDIHQPL,Positive,HLA-A02:01,Homo sapiens,Leishmania donovani,3'-nucleotidase/nuclease,0.376591457622471
+HVYAHQAQT,Positive,HLA-A02:01,Homo sapiens,Mycobacterium tuberculosis,transmembrane protein,0.413142705104903
+NLVGMVATV,Positive,HLA-A02:01,Homo sapiens,Human betaherpesvirus 5,,0.60746919103998
+IMVLSFLFL,Positive,HLA-A02:01,Homo sapiens,circumsporozoite (CS) protein|Plasmodium falciparum,circumsporozoite (CS) protein|circumsporozoite protein|Circumsporozoite protein precursor,0.223821019174723
+TLYTAVSST,Positive,HLA-A02:01,Homo sapiens,Human papillomavirus type 16,E2,0.415691904680601
+ILGKFLHWL,Positive,HLA-A02:01,Homo sapiens,,,0.388867116729934
+VIVMLTPLV,Positive,HLA-A02:01,Homo sapiens,|Homo sapiens,protein tyrosine phosphatase receptor type N precursor|Receptor-type tyrosine-protein phosphatase-like N precursor|tyrosine phosphatase,0.424727772613589
+VQYLGMFPV,Positive,HLA-A02:01,Homo sapiens,,,0.46976525281904
+AIMDKNIML,Positive,HLA-A02:01,Homo sapiens|Homo sapiens Caucasian|Homo sapiens|Homo sapiens Caucasian,|Influenza A virus,|Non-structural protein 1,0.402008741676864
+FMYSDFHFI,Positive,HLA-A02:01,Homo sapiens,|Influenza A virus|Influenza A virus (A/Puerto Rico/8/1934(H1N1)),PA|Polymerase|Polymerase acidic protein|polymerase PA,0.170485019031766
+GINTIPIAL,Positive,HLA-A02:01,Homo sapiens,Mycobacterium bovis|Mycobacterium tuberculosis|Mycobacterium tuberculosis|Mycobacterium tuberculosis variant bovis BCG,PPE family protein PPE68,0.442855230502843
+STAPPVHNV,Positive,HLA-A02:01,Homo sapiens,,Mucin-1,0.6735183693243
+IADAALAAL,Positive,HLA-A02:01,Homo sapiens,Mycobacterium tuberculosis,transmembrane protein,0.75717653497782
+YIYGIPLSL,Positive,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,kelch-like protein|Kelch repeat protein A55,0.500827327728252
+FVAQRTLRV,Positive,HLA-A02:01,Homo sapiens,Human alphaherpesvirus 1,nuclear protein UL24,0.664955008360201
+SMHFYGWSL,Positive,HLA-A02:01,Homo sapiens,Vaccinia virus|Vaccinia virus NYCBH - Dryvax,Ribonucleoside-diphosphate reductase large chain|ribonucleotide reductase large subunit|ribonucleotide reductase large subunit,0.678897486574142
+ALSEDLLSI,Positive,HLA-A02:01,Homo sapiens,,Thyroid peroxidase,0.672093034562476
+QLLKLNVPA,Positive,HLA-A02:01,Homo sapiens,,Probable ubiquitin carboxyl-terminal hydrolase FAF-Y,0.509455592310923
+ILLGSLSDL,Positive,HLA-A02:01,Homo sapiens,Hantaan orthohantavirus,RNA-dependent RNA polymerase,0.60147052636878
+ILLLSLNPV,Positive,HLA-A02:01,Homo sapiens,,NADH dehydrogenase 4,0.487960111440377
+RMFPNAPYL,Positive,HLA-A02:01,Homo sapiens|Homo sapiens (human),|Homo sapiens,Wilms tumor protein|Wilms tumor protein isoform D [Homo sapiens],0.505216399646256
+ALLKHRFEI,Positive,HLA-A02:01,Homo sapiens,Influenza A virus|Influenza A virus (A/Puerto Rico/8/1934(H1N1)),Polymerase acidic protein,0.667105386359817
+TLIVNLVEV,Positive,HLA-A02:01,Homo sapiens,Human betaherpesvirus 5,Glycoprotein M|UL100; gM,0.364924994357934
+LLCGNLLIL,Positive,HLA-A02:01,Homo sapiens,Human betaherpesvirus 6B,virion transactivator,0.479392853018456
+ILGFVFTLT,Positive,HLA-A02:01,Homo sapiens,Influenza A virus,matrix protein 1|Matrix protein 1,0.422154749449602
+KLADYLNVL,Positive,HLA-A02:01,Homo sapiens,,,0.575554691468012
+TLAARIKFL,Positive,HLA-A02:01,Homo sapiens,,Histone demethylase UTY,0.586616360724388
+GLTSFFIAI,Positive,HLA-A02:01,Homo sapiens,,,0.357774872991732
+RMWDFDIFL,Positive,HLA-A02:01,Homo sapiens,,,0.367212677117054
+QLIPCMDVV,Positive,HLA-A02:01,Homo sapiens,Gluten from Triticum aestivum|Triticum aestivum,Alpha-gliadin|Alpha/beta-gliadin A-I precursor,0.56573413367763
+LLWTLVVLL,Positive,HLA-A02:01,Homo sapiens|Homo sapiens Caucasian|Homo sapiens|Homo sapiens Caucasian,|Human gammaherpesvirus 4|Human herpesvirus 4 strain B95-8,latent membrane protein 2|Latent membrane protein 2|membrane protein,0.392003285534159
+GILTVSVAV,Positive,HLA-A02:01,Homo sapiens,|Mycobacterium tuberculosis,14 kDa antigen|HEAT SHOCK PROTEIN HSPX (ALPHA-CRSTALLIN HOMOLOG) (14 kDa ANTIGEN) (HSP16.3),0.423909006694008
+RVTGGVFLV,Positive,HLA-A02:01,Homo sapiens,Hepatitis B virus,DNA polymerase [Hepatitis B virus],0.785529218736118
+GVLGFVFTL,Positive,HLA-A02:01,Homo sapiens,Influenza A virus,matrix protein 1,0.670492858399193
+NLIKLAQKV,Positive,HLA-A02:01,Homo sapiens,,Vitamin D-binding protein,0.504889170239577
+SLFNTVVTL,Positive,HLA-A02:01,Homo sapiens Caucasian,Human immunodeficiency virus 1,gag protein,0.451681404014476
+DLPLIIQRL,Positive,HLA-A02:01,Homo sapiens,Hepatitis C virus genotype 1|Hepatitis C virus genotype 3,RNA-dependent RNA polymerase,0.540569284879751
+FLFMYLVMV,Positive,HLA-A02:01,Homo sapiens,,,0.262233538557282
+PLPLTQPGE,Positive,HLA-A02:01,Homo sapiens,Human gammaherpesvirus 8,LANA,0.643225814882618
+ILMHCQTTL,Positive,HLA-A02:01,Homo sapiens,|Homo sapiens,Glutamate decarboxylase 2,0.679009449474327
+YIIVFVVAL,Positive,HLA-A02:01,Homo sapiens,,orexin receptor type 2 isoform X1 [Homo sapiens],0.0921332921428374
+GMFNMLSTV,Positive,HLA-A02:01,Homo sapiens,Influenza A virus|Influenza A virus (A/Puerto Rico/8/1934(H1N1)),RNA-directed RNA polymerase catalytic subunit,0.571448199696653
+VCWGELMNL,Positive,HLA-A02:01,Homo sapiens,Hepatitis B virus,Core protein,0.712365568918228
+SVASTITGV,Positive,HLA-A02:01,Homo sapiens,,Perilipin-2,0.328925227179983
+LLWSYAMGV,Positive,HLA-A02:01,Homo sapiens,Measles morbillivirus|Measles virus strain Edmonston,nucleoprotein|Nucleoprotein,0.797975115473432
+LVISGLFPV,Positive,HLA-A02:01,Homo sapiens,Dengue virus,polyprotein,0.491522026357962
+SQLAHLVYV,Positive,HLA-A02:01,Homo sapiens,Human alphaherpesvirus 1,envelope glycoprotein M,0.539885990273014
+YLIPAVTSL,Positive,HLA-A02:01,Homo sapiens,Hantaan orthohantavirus,RNA-dependent RNA polymerase,0.520137421542076
+YVLEETSVM,Positive,HLA-A02:01,Homo sapiens,Human betaherpesvirus 5,regulatory protein IE1|UL123; IE1,0.581417038313826
+TLQDIVLHL,Positive,HLA-A02:01,Homo sapiens,|Alphapapillomavirus 7|Human papillomavirus type 18,Protein E7,0.546232762732533
+NLIALSLGL,Positive,HLA-A02:01,Homo sapiens,,type II CRISPR RNA-guided endonuclease Cas9 [Streptococcus pyogenes],0.573525558911753
+FMIGYTSAL,Positive,HLA-A02:01,Homo sapiens,,,0.563953253537987
+TYSAGIVQI,Positive,HLA-A02:01,Homo sapiens,Human gammaherpesvirus 4,EBNA-3B|EBNA-3B nuclear protein|EBNA3B (EBNA4A) latent protein|Epstein-Barr nuclear antigen 4,0.348021219728791
+ALLKDTVYT,Positive,HLA-A02:01,Homo sapiens,,proto-oncogene PIM1,0.514387054128019

@@ -1,0 +1,184 @@
+---
+title: "Models_unreliable_neoantigens"
+author: "PBUCKLEY"
+date: "20/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(data.table)
+library(dplyr)
+library(purrr)
+library(tidyverse)
+library(ggpubr)
+library(Biostrings)
+library(foreach)
+library(doParallel)
+library(yardstick)
+
+```
+
+# Figure 3
+- Fig 3A and 3B are stochastically generated, so minor nuances may be observed for the random distributions here and between the figures in the paper. The trends and analysis however will be preserved.
+# Fig 3A
+
+```{r}
+combinedData=readRDS(file="GBM_Benchmark_A201_Train/HLA_Specific_GBM_combinedData.rds")
+combinedData$Immunogenicity = factor(combinedData$Immunogenicity,levels=c("Positive","Negative"))
+combinedData$ImmunogenicityPrediction = factor(combinedData$ImmunogenicityPrediction,levels=c("Positive","Negative"))
+
+```
+
+```{r,fig.cap="Area under the precision-recall curve for a distribution of PR-AUC values after randomising the true classification. Dashed line shows PR-AUC of the predictions made during the benchmarking experiment.",fig.width=6,fig.height=6,dev='svg'}
+
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+ PR_AUC_RAND.DIST=foreach(i = 1:1000, .combine = rbind,.packages = c("dplyr","magrittr","yardstick","data.table")) %dopar% {
+combinedData %>%  group_by(Dataset) %>% mutate(Shuffled_Immunogenicity=sample(size=n(),Immunogenicity))  %>% pr_auc(Shuffled_Immunogenicity,ImmunogenicityScore) %>% mutate(sampleNum=i)
+   }
+
+stopCluster(cl)
+
+
+PR_AUC_COMBINED=combinedData %>% group_by(Dataset) %>% pr_auc(Immunogenicity,ImmunogenicityScore)
+
+PR_AUC_RAND.DIST %>% ggdensity(x=".estimate",y="..density..",fill="Dataset",add="mean",color = "Dataset",alpha=0.2)  + facet_wrap(~Dataset) + geom_vline(data=PR_AUC_COMBINED,aes(xintercept=.estimate),color="black",linetype="dashed") + xlab("Area under the precision-recall curve") + font("xy.text",size=12,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.title",color="white") + font("legend.text",size=10)+ theme(legend.position = "none")+rotate_x_text(angle=90)
+
+
+PR_AUC_RAND.DIST %>% group_by(Dataset) %>% dplyr::summarise(Random_mean=mean(.estimate),sd=sd(.estimate)) %>% inner_join(PR_AUC_COMBINED %>% select(!c(.metric,.estimator))) %>% dplyr::rename(Predicted=.estimate) %>% mutate(zscore = round(((Predicted-Random_mean)/sd),2) ) %>% DT::datatable(caption="Mean, sd and zscore to show distance from mean of random distribution")
+
+
+```
+
+# Fig 3B
+
+```{r}
+combinedData=readRDS(file="Bjerregaard_HLA_specific/HLASpecific_Bjerregaard_combinedData.rds")
+combinedData$Immunogenicity = factor(combinedData$Immunogenicity,levels=c("Positive","Negative"))
+combinedData$ImmunogenicityPrediction = factor(combinedData$ImmunogenicityPrediction,levels=c("Positive","Negative"))
+
+```
+
+```{r,fig.cap="Area under the precision-recall curve for a distribution of PR-AUC values after randomising the true classification. Dashed line shows PR-AUC of the predictions made during the benchmarking experiment.",fig.width=6,fig.height=6,dev='svg'}
+
+#setup parallel backend to use many processors
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload your computer
+registerDoParallel(cl)
+
+ PR_AUC_RAND.DIST=foreach(i = 1:1000, .combine = rbind,.packages = c("dplyr","magrittr","yardstick","data.table")) %dopar% {
+combinedData %>%  group_by(Dataset) %>% mutate(Shuffled_Immunogenicity=sample(size=n(),Immunogenicity))  %>% pr_auc(Shuffled_Immunogenicity,ImmunogenicityScore) %>% mutate(sampleNum=i)
+   }
+
+stopCluster(cl)
+
+
+PR_AUC_COMBINED=combinedData %>% group_by(Dataset) %>% pr_auc(Immunogenicity,ImmunogenicityScore)
+
+
+PR_AUC_RAND.DIST %>% ggdensity(x=".estimate",y="..density..",fill="Dataset",add="mean",color = "Dataset",alpha=0.2)  + facet_wrap(~Dataset) + geom_vline(data=PR_AUC_COMBINED,aes(xintercept=.estimate),color="black",linetype="dashed") + xlab("Area under the precision-recall curve") + font("xy.text",size=12,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.title",color="white") + font("legend.text",size=10)+ theme(legend.position = "none")+rotate_x_text(angle=90)
+
+PR_AUC_RAND.DIST %>% group_by(Dataset) %>% dplyr::summarise(Random_mean=mean(.estimate),sd=sd(.estimate)) %>% inner_join(PR_AUC_COMBINED %>% select(!c(.metric,.estimator))) %>% dplyr::rename(Predicted=.estimate) %>% mutate(zscore = round(((Predicted-Random_mean)/sd),2) ) %>% DT::datatable(caption="Mean, sd and zscore to show distance from mean of random distribution")
+
+```
+
+# Compile data for Fig 3C-D
+- First read in GBM data, then NetTepi's results for HLA Specific training
+- Combine these data 
+
+```{r}
+# Compile the netTepi HLASpecific GBM dataset
+FullDataset = fread("GBM_Benchmark_A201_Train/GBM_Peptides.tsv")
+FullDataset=FullDataset %>% select(Norm_peptide,Mut_peptide,HLA_allele,Mismatches,tcell_response_updatedNov19) %>% dplyr::rename(
+  Peptide=Mut_peptide,HLA_Allele=HLA_allele,Immunogenicity=tcell_response_updatedNov19) %>% mutate(
+    Immunogenicity = ifelse(Immunogenicity=='positive','Positive','Negative'))
+# Remove contradictory / duplicated peptides
+FullDataset[FullDataset$Peptide == 'SLHLDAWTI' & FullDataset$Immunogenicity == 'Negative',]$Immunogenicity = 'Positive'
+FullDataset=FullDataset %>% unique
+FullDataset=FullDataset %>% filter(width(Peptide)==9)
+FullDataset = FullDataset %>% select(!c(Mismatches))
+
+TEST_DATA_LOCATION="GBM_Benchmark_A201_Train/NETTEPI/"
+data_path <- TEST_DATA_LOCATION
+files <- dir(data_path, pattern = "*_Results.txt")
+
+data3 <- data_frame(file = files) %>%
+  mutate(file_contents = map(file,
+           ~ fread(file.path(data_path, .)))
+  )
+
+
+NETTEPI_RESULTS.full = unnest(data3) %>% as.data.table  %>% select(!c(file,Pos,Identity,`%Rank`)) %>% dplyr::rename(ImmunogenicityScore=Comb)
+NETTEPI_RESULTS.full=NETTEPI_RESULTS.full %>% inner_join(FullDataset) %>% mutate(Dataset="NETTEPI") %>% unique
+
+```
+
+# Fig 3C
+
+```{r,fig.width=8,fig.height=8,dev='svg'}
+mycomparisons = list(c("Negative","Positive"))
+
+NETTEPI_RESULTS.full %>% ggviolin(x="Immunogenicity",y="Aff",fill="Immunogenicity",add=c("jitter","boxplot"))+stat_compare_means(comparisons = mycomparisons,label = "p.signif",label.x.npc =  0.5,label.y=1.12)+ylim(-0.25,1.12)+ font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.text",size=16)+ font("legend.title",size=16) + ylab("NetTepi Binding Affinity Score")
+```
+
+# Fig 3D
+
+```{r,fig.width=8,fig.height=8,dev='svg'}
+NETTEPI_RESULTS.full %>% ggviolin(x="Immunogenicity",y="ImmunogenicityScore",fill="Immunogenicity",add=c("jitter","boxplot"))+stat_compare_means(comparisons = mycomparisons,label = "p.signif",label.x.npc =  0.5,label.y=1.12)+ylim(-0.25,1.12)+ font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.text",size=16)+ font("legend.title",size=16) + ylab("NetTepi Combined Immunogenicity Score")
+
+```
+
+# Compile data for Fig 3E
+- Read in Bjerregaard HLA-specific for NetTepi
+
+```{r}
+
+FullDataset = fread("Bjerregaard_HLA_specific/Nonameric_WT_Mutant.csv")%>% dplyr::rename(immunogenicity_binary=`Immunogenic (1=yes)`,WT_Peptide=`Wild type peptide`,Peptide=`Mutant peptide`) %>% mutate(Immunogenicity=ifelse(immunogenicity_binary==1,"Positive","Negative")) %>% select(!c(`Wild type score`,`Mutant score`))
+
+FullDataset=FullDataset %>% filter(width(Peptide)==9)
+FullDataset=FullDataset %>% mutate(HLA_Allele = 'HLA-A02:01')
+
+TEST_DATA_LOCATION="Bjerregaard_HLA_specific/NETTEPI/"
+data_path <- TEST_DATA_LOCATION
+files <- dir(data_path, pattern = "*_Results.txt")
+
+data3 <- data_frame(file = files) %>%
+  mutate(file_contents = map(file,
+           ~ fread(file.path(data_path, .)))
+  )
+
+
+NETTEPI_RESULTS.full = unnest(data3) %>% as.data.table  %>% select(!c(file,Pos,Identity,`%Rank`)) %>% dplyr::rename(ImmunogenicityScore=Comb)
+NETTEPI_RESULTS.full=NETTEPI_RESULTS.full %>% inner_join(FullDataset) %>% mutate(Dataset="NETTEPI") %>% unique
+```
+
+# Fig 3E
+
+```{r,fig.width=8,fig.height=8,dev='svg'}
+mycomparisons = list(c("Negative","Positive"))
+
+NETTEPI_RESULTS.full %>% ggviolin(x="Immunogenicity",y="Aff",fill="Immunogenicity",add=c("jitter","boxplot"))+stat_compare_means(comparisons = mycomparisons,label = "p.signif",label.x.npc =  0.5,label.y=1.12)+ylim(-0.25,1.12)+ font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.text",size=16)+ font("legend.title",size=16) + ylab("NetTepi Binding Affinity Score")
+```
+
+# Fig 3F
+
+```{r,fig.width=8,fig.height=8,dev='svg'}
+NETTEPI_RESULTS.full %>% ggviolin(x="Immunogenicity",y="ImmunogenicityScore",fill="Immunogenicity",add=c("jitter","boxplot"))+stat_compare_means(comparisons = mycomparisons,label = "p.signif",label.x.npc =  0.5,label.y=1.12)+ylim(-0.25,1.12)+ font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.text",size=16)+ font("legend.title",size=16) + ylab("NetTepi Combined Immunogenicity Score")
+
+
+```
+
+
+
+
+
+
+
+
+
+

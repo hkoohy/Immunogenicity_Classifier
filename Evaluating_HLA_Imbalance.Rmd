@@ -1,0 +1,119 @@
+---
+title: "Evaluating_HLA_Imbalance"
+author: "PBUCKLEY"
+date: "20/01/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(dplyr)
+library(purrr)
+library(tidyverse)
+library(ggpubr)
+library(Biostrings)
+library(foreach)
+library(doParallel)
+library(yardstick)
+library(pROC)
+
+```
+
+# Read in data
+- Pan HLA dataset and 10-fold cv results
+- Set HLA A0201 binary
+```{r}
+combinedData=readRDS(file="Analysis_Pan_HLA_Pathogenic/PanHLA_combinedData.rds")
+FullDataset=readRDS(file="Analysis_Pan_HLA_Pathogenic/PanHLA_FullDataset.rds")
+
+combinedData=combinedData %>% mutate(A201_OR_NOT = ifelse(grepl("HLA-A02:01",HLA_Allele),"HLA-A02:01","HLA-A02:01\nNegative"))
+FullDataset=FullDataset %>% mutate(A201_OR_NOT = ifelse(grepl("HLA-A02:01",HLA_Allele),"HLA-A02:01","HLA-A02:01\nNegative"))
+combinedData$A201_OR_NOT = factor(combinedData$A201_OR_NOT,levels = c("HLA-A02:01","HLA-A02:01\nNegative"))
+
+```
+
+# Fig 4A
+
+```{r,dev='svg',fig.width=5}
+
+FullDataset %>% select(Immunogenicity,A201_OR_NOT) %>% table %>% as.data.table %>% ggbarplot(x="A201_OR_NOT",y="N",fill = "Immunogenicity",position=position_dodge2()) + xlab("Allele Grouping")+ylab("Number of Peptides")
+
+```
+
+# Fig 4B
+
+```{r,fig.width=8,fig.height=7,dpi=300}
+# For statistical comparison
+mycomparisons = list(c("HLA-A02:01","HLA-A02:01\nNegative"))
+
+combinedData %>% group_by(Dataset)%>% select(A201_OR_NOT,ImmunogenicityScore,Dataset)%>% ggviolin(x="A201_OR_NOT",y="ImmunogenicityScore",facet.by = "Dataset",fill="A201_OR_NOT",add="boxplot")+ylim(-1,1.3) + stat_compare_means(label="p.signif",label.x.npc = "center",method = "wilcox.test",comparisons = mycomparisons,label.y=1.22)+font("legend.text",color = "white")+font("legend.title",color="white")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+font("xy.text",size=14)  + theme(strip.text.x = element_text(size = 12))+ xlab("Allele Grouping")+ylab("Model Immunogenicity Score")+rotate_x_text(angle=50)+ theme(legend.position = "none")
+```
+
+
+# Fig 4C
+
+```{r,fig.width=8,fig.height=7,dpi=300}
+
+combinedData %>% group_by(Dataset) %>% filter(Immunogenicity == 'Negative') %>% select(A201_OR_NOT,ImmunogenicityScore,Dataset) %>% ggviolin(x="A201_OR_NOT",y="ImmunogenicityScore",facet.by = "Dataset",fill="A201_OR_NOT",add="boxplot")+ylim(-1,1.3)+ stat_compare_means(label="p.signif",label.x.npc = "center",method = "wilcox.test",comparisons = mycomparisons,label.y = 1.22)+font("legend.text",color = "white")+font("legend.title",color="white")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+font("xy.text",size=14)  + theme(strip.text.x = element_text(size = 12))+ xlab("Allele Grouping")+ylab("Model Immunogenicity Score")+rotate_x_text(angle=50)+ theme(legend.position = "none")
+
+```
+
+# Fig 4D 
+
+```{r,fig.width=8,fig.height=7,dpi=300}
+combinedData %>% group_by(Dataset) %>% filter(Immunogenicity == 'Positive') %>% select(A201_OR_NOT,ImmunogenicityScore,Dataset)%>% ggviolin(x="A201_OR_NOT",y="ImmunogenicityScore",facet.by = "Dataset",fill="A201_OR_NOT",add="boxplot")+ylim(-1,1.3) + stat_compare_means(label="p.signif",label.x.npc = "center",method = "wilcox.test",comparisons = mycomparisons,label.y=1.22)+font("legend.text",color = "white")+font("legend.title",color="white")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black")+font("xy.text",size=14)  + theme(strip.text.x = element_text(size = 12))+ xlab("Allele Grouping")+ylab("Model Immunogenicity Score")+rotate_x_text(angle=50)+ theme(legend.position = "none")
+
+```
+
+# Fig 4E: Compute ROC
+- Compute ROC for A201 binary using immunogenicity scores from training and testing on Pan HLA immunogenicity data.
+
+```{r ,fig.width=8,fig.height=6,message=FALSE,warning=FALSE,dev='svg'}
+NETTEPIAUC=roc(A201_OR_NOT ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'NETTEPI'))
+IPREDAUC=roc(A201_OR_NOT ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'IPRED'))
+IEDBMODELAUC=roc(A201_OR_NOT ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'IEDB'))
+REPITOPE_AUC_CV=roc(A201_OR_NOT ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'REPITOPE'))
+NetTepi_NETMHC.AUC.CV = roc(A201_OR_NOT ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'NETTEPI_netMHCpan4'))
+```
+
+# Fig 4E
+
+```{r ,fig.width=8,fig.height=6,message=FALSE,warning=FALSE,dev='svg'}
+roc.AUC=ggroc(list(IEDB_Model=IEDBMODELAUC,iPred=IPREDAUC,NetTepi=NETTEPIAUC,NetTepi_NetMHCpan4=NetTepi_NETMHC.AUC.CV,REpitope=REPITOPE_AUC_CV),legacy.axes = TRUE,size=1.25) + theme_bw() +
+  annotate("size"=5,"text",x=.55,y=.185,label=paste0("IEDB:     ",round(auc(IEDBMODELAUC),digits=3),"\n","iPred:     ",round(auc(IPREDAUC),digits=3),"\n","NetTepi: ",round(auc(NETTEPIAUC),digits=3),"\n","NetTepi_NetMHCpan4: ",round(auc(NetTepi_NETMHC.AUC.CV),digits=3),"\n","Repitope: ",round(auc(REPITOPE_AUC_CV),digits=3))) + font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.title",color="white") + font("legend.text",size=12) + geom_abline(size=1,intercept = 0, slope = 1,color = "darkgrey", linetype = "dashed")
+
+roc.AUC
+
+```
+
+# Fig 4F : Compute ROC
+
+```{r}
+combinedData = readRDS("PREDICT_HLA_combinedData.rds")
+NETTEPIAUC=roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'NETTEPI'))
+IPREDAUC=roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'IPRED'))
+IEDBMODELAUC=roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'IEDB'))
+REPITOPE_AUC_CV=roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'REPITOPE'))
+NetTepi_NETMHC.AUC.CV = roc(Immunogenicity ~ ImmunogenicityScore,data=combinedData %>% filter(Dataset %in% 'NETTEPI_netMHCpan4'))
+
+roc.AUC=ggroc(list(IEDB_Model=IEDBMODELAUC,iPred=IPREDAUC,NetTepi=NETTEPIAUC,NetTepi_NetMHCpan4=NetTepi_NETMHC.AUC.CV,REpitope=REPITOPE_AUC_CV),legacy.axes = TRUE,size=1.25) + theme_bw() +
+  annotate("size"=5,"text",x=.55,y=.185,label=paste0("IEDB:     ",round(auc(IEDBMODELAUC),digits=3),"\n","iPred:     ",round(auc(IPREDAUC),digits=3),"\n","NetTepi: ",round(auc(NETTEPIAUC),digits=3),"\n","NetTepi_NetMHCpan4: ",round(auc(NetTepi_NETMHC.AUC.CV),digits=3),"\n","Repitope: ",round(auc(REPITOPE_AUC_CV),digits=3))) + font("xy.text",size=16,color="black")+ font("xlab",size=16,color="black")+ font("ylab",size=16,color="black") + font("legend.title",color="white") + font("legend.text",size=12) + geom_abline(size=1,intercept = 0, slope = 1,color = "darkgrey", linetype = "dashed")
+ 
+ 
+```
+
+# Fig 4F
+
+```{r}
+roc.AUC
+```
+
+
+
+
+
+
+
+
+
